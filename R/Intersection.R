@@ -70,14 +70,18 @@ getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id"){
 		}
 	}
 	#encapsulate Polygons in a SpatialPolygons object
-	sp <- SpatialPolygons(intersects, proj4string = CRS(proj4string(features1)))
-	
-	#prepare attributes data.frame
-	colnames(attrs) <- featureType
-	row.names(attrs) <- attrs$ID
-	
-	#join attributes to features
-	id <- match(sapply(slot(sp, "polygons"), function(x) slot(x,"ID")), row.names(attrs))
-    spdf <- SpatialPolygonsDataFrame(sp[!is.na(id),],attrs[id[!is.na(id)],],match.ID=TRUE)
+	spdf <- NULL
+	if(length(intersects) > 0){
+		sp <- SpatialPolygons(intersects, proj4string = CRS(proj4string(features1)))
+		
+		#prepare attributes data.frame
+		colnames(attrs) <- featureType
+		row.names(attrs) <- attrs$ID
+		
+		#join attributes to features
+		id <- match(sapply(slot(sp, "polygons"), function(x) slot(x,"ID")), row.names(attrs))
+		spdf <- SpatialPolygonsDataFrame(sp[!is.na(id),],attrs[id[!is.na(id)],],match.ID=TRUE)
+		
+	}
 	return(spdf);
 }
