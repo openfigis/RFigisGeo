@@ -63,5 +63,47 @@ readWFS <- function(url, outputFormat = "GML2", p4s = NULL, gmlIdAttributeName="
 }
 
 
-
+# Export sp object to well-known formats
+#
+# Arguments:
+# - features: the sp object to export
+# - outputFormat: the format of the output file, by default "SHAPE-ZIP" (a zipped shapefile)
+# - file.path: the base path where to export the features
+# - file.name: the name of the output file
+#
+# Notes:
+# - only supported for GML and SHAPE-ZIP
+#
+exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NULL, file.name = NULL){
+	
+	ug <- uuid.gen()
+	uuid<-ug()
+	if(is.null(file.name)){
+		file.name <- uuid
+	}
+	if(is.null(file.path)){
+		file.path <- paste(tempdir(),"/",uuid,sep="")
+	}
+	
+	#manage output formats
+	if(outputFormat == "SHAPE-ZIP"){
+		writeOGR(features, file.path, file.name, driver="ESRI Shapefile")
+		zip_path<-paste(file.path,"/",file.name,".zip",sep="")
+		shapefiles <- list.files(file.path, full.names=TRUE)
+		zip(zipfile=zip_path, flags="-r9Xj", files=shapefiles) # requires R_ZIPCMD to be set in linux OS.
+		
+		if (! file.exists(zip_path)) {
+			zip_path <- NA
+			stop("Error when creating zip file")
+		}
+		outputFile <- paste(file.path, "/", file.name, ".zip", sep="")
+		
+	}else if(outputFormat == "GML"){
+		writeOGR(rfeatures, file.path, file.name, driver="GML")
+		outputFile <- paste(file.path, "/", file.name, ".gml", sep="")
+	}else{
+		stop("Unsupported output format")
+	}
+	return(outputFile)
+}
 

@@ -6,5 +6,6 @@ import(dplR)
 
 export(
 	readWFS,
+	exportFeatures,
 	getIntersection
 )
