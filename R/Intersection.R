@@ -19,10 +19,10 @@
 getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id"){
 
 	#check CRS
-	#if(proj4string(features1) != proj4string(features2)){
-	#	print("CRS differ, try to project the second feature collection")
-	#	features2 <- spTransform(features2, CRS(proj4string(features1)));		
-	#}
+	if(proj4string(features1) != proj4string(features2)){
+		print("CRS differ, try to project the second feature collection")
+		features2 <- spTransform(features2, CRS(proj4string(features1)));		
+	}
 	
 	#prepare schema (for attributes)
 	dfText = "attrs <- data.frame("
