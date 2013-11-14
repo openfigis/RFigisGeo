@@ -1,0 +1,10 @@
+import(XML)
+import(sp)
+import(rgdal)
+import(rgeos)
+import(dplR)
+
+export(
+	readWFS,
+	getIntersection
+)
