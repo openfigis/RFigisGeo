@@ -89,7 +89,7 @@ exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NUL
 	if(outputFormat == "SHAPE-ZIP"){
 		writeOGR(features, file.path, file.name, driver="ESRI Shapefile")
 		zip_path<-paste(file.path,"/",file.name,".zip",sep="")
-		shapefiles <- list.files(file.path, full.names=TRUE)
+		shapefiles <- list.files(file.path, pattern = file.name, full.names=TRUE)
 		zip(zipfile=zip_path, flags="-r9Xj", files=shapefiles) # requires R_ZIPCMD to be set in linux OS.
 		
 		if (! file.exists(zip_path)) {
