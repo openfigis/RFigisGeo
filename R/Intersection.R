@@ -3,7 +3,7 @@
 #
 # Description: computes an intersection
 # Creation Date: 2013/11/14
-# Revision Date: -
+# Revision Date: 2013/11/18
 #=======================
 
 # Computes an Intersection and returns a sp object
@@ -12,11 +12,12 @@
 # - features1: a first sp object
 # - features2: a second sp object
 # - gmlIdAttributeName: specific to GML, the name of the ID attribute, by default "gml_id"
+# - areaCRS: a CRS object used as reference for area calculation
 #
 # Notes:
 # - only supported for GML2 for now
 #
-getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id"){
+getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id", areaCRS = NULL){
 
 	#check CRS
 	if(proj4string(features1) != proj4string(features2)){
@@ -51,7 +52,8 @@ getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id"){
 			dfText <-paste(dfText, ",", colnames(data2)[i], "=",clazz, sep="")
 		}
 	}
-	dfText <- paste(dfText, ")", sep="")
+	dfText <- paste(dfText, ",INT_AREA=numeric(0)", sep="") # add intersection area as attribute
+	dfText <- paste(dfText, ")", sep="") #close schema preparation
 	eval(parse(text=dfText))
 	featureType <- gsub("\\.", "_", colnames(attrs))
 	
@@ -63,9 +65,20 @@ getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id"){
 			intersection <- gIntersection(features1[i,], features2[j,])
 			
 			if(!is.null(intersection)){
-				intersects[[ID]] <- Polygons(slot(slot(intersection, "polygons")[[1]], "Polygons"), ID = ID)
+				obj <- Polygons(slot(slot(intersection, "polygons")[[1]], "Polygons"), ID = ID)
+				if(!is.null(areaCRS)){
+					slot(obj, "area") <- gArea(spTransform(intersection, areaCRS))
+				}
+				intersects[[ID]] <- obj
 				drop <- c(gmlIdAttributeName)
-				attrs <- rbind(attrs, cbind(ID, features1[i,]@data[, !(colnames(data1) %in% drop)], features2[j,]@data[, !(colnames(data2) %in% drop)]))
+				attrs <- rbind(
+							attrs,
+							cbind(
+								ID,
+								features1[i,]@data[, !(colnames(data1) %in% drop)],
+								features2[j,]@data[, !(colnames(data2) %in% drop)],
+								slot(obj, "area"))
+						)
 			}
 		}
 	}
