@@ -17,12 +17,15 @@
 # Notes:
 # - only supported for GML2 for now
 #
-readWFS <- function(url, outputFormat = "GML2", p4s = NULL, gmlIdAttributeName="gml_id"){
+readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
 	
 	#request
-	wfsRequest <- paste(url, "&outputFormat=", outputFormat, sep="")
-	
-	if(outputFormat == "GML2"){
+	wfsRequest <- url
+	if(outputFormat != "GML") {
+		wfsRequest <- paste(url, "&outputFormat=", outputFormat, sep="")
+	}
+		
+	if(outputFormat == "GML") {
 		
 		# download the data
 		tempf = tempfile() 
