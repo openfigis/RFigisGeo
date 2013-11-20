@@ -10,12 +10,10 @@
 #
 # Arguments:
 # - url: the baseURL of the WFS GetFeature request
-# - outputFormat: the output format for the WFS GetFeature request, by default "GML2"
+# - outputFormat: the output format for the WFS GetFeature request, by default "GML"
 # - p4s: an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)
 # - gmlIdAttributeName: specific to GML, the name of the ID attribute, by default "gml_id"
 #
-# Notes:
-# - only supported for GML2 for now
 #
 readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
 	
@@ -38,23 +36,41 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 				
 		# get the Spatial Reference System (SRS)
 		xmlfile<-xmlTreeParse(destfile,useInternalNodes = TRUE)
-		workspace <-unlist(strsplit(xmlName(xmlChildren(getNodeSet(xmlfile,paste('//','gml:featureMember', sep=''))[[1]])[[1]], full = T),':'))[1]
-		node<-getNodeSet(xmlfile, paste("//", workspace, ":the_geom/*",sep=""))
+		feat <-xmlChildren(getNodeSet(xmlfile,paste('//','gml:featureMember', sep=''))[[1]])[[1]]
+		ns <-unlist(strsplit(xmlName(feat, full = T),':'))[1]
+		node<-getNodeSet(xmlfile, paste("//", ns, ":the_geom/*",sep=""))
 		if(length(node) == 0){
-			#try with uppercase geom name (case of Oracle datastore layers)
-			node<-getNodeSet(xmlfile, paste("//", workspace, ":THE_GEOM/*",sep=""))
+			node<-getNodeSet(xmlfile, paste("//", ns, ":THE_GEOM/*",sep="")) #try with uppercase geom name (case of Oracle datastore layers)
 		}
-		value<-sapply(node, function(x) xmlGetAttr(x, "srsName"))
-		srsValue<-strsplit(value,"#")[[1]][2]
-		projection<-paste("+init=epsg:",srsValue,sep="")
+		node <- xmlRoot(xmlDoc(node[[1]]))
+		srsName <- xmlGetAttr(node, "srsName")
+	
+		#srsName patterns matching
+		srs <- NA
+		srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
+		if(length(regexpr(srsPattern, srsName, ignore.case = T)) == 1){
+			epsg <- unlist(strsplit(srsName, srsPattern))[2]
+			srs <- paste("+init=epsg:", epsg, sep="")
+		}else{
+			srsPattern = "urn:EPSG" #match case 2
+			if(length(regexpr(srsPattern, srsName, ignore.case = T)) == 1){
+				srsStr <- unlist(strsplit(srsName, ":"))
+				epsg <- srsStr[length(srsStr)]
+				srs <- paste("+init=epsg:", epsg, sep="")
+			}else{
+				#TODO match case 3
+				#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
+				#if yes set srs with the corresponding proj4string
+
+			}
+		}
+		
+		if(is.na(srs)){
+			warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
+		}
 		
 		if (missing(p4s)){
-			try(crs<-CRS(projection), silent = T)
-			if(!exists("crs")){
-				stop("The code ", srsValue, " is an unknown EPSG code. Specify the p4s projection argument (PROJ4 format).")
-			}else{
-				features = readOGR(destfile, layername, p4s = projection, disambiguateFIDs=TRUE)
-			} 
+			features = readOGR(destfile, layername, p4s = srs, disambiguateFIDs=TRUE)
 		}else{
 			features = readOGR(destfile, layername, p4s = p4s, disambiguateFIDs=TRUE)
 		}
