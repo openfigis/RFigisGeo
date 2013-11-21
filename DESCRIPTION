@@ -2,8 +2,8 @@ Package: RFigisGeo
 Version: 0.1
 Date: 2013-11-14
 Title: A package to facilitate geoprocessing
-Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email =
-    "emmanuel.blondel1@gmail.com"))
+Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel1@gmail.com"),
+			 person("Norbert", "Billet", role = c("aut","cre"), email = "norbert.billet@ird.fr"))
 Depends: R (>= 2.15), XML, sp, rgdal, rgeos, dplR
 Imports: methods
 Description: The package hosts a set of facilitites to perform geoprocessing

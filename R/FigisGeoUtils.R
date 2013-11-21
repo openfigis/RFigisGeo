@@ -1,5 +1,7 @@
 # FigisGeoUtils.R
-# Author: Emmanuel Blondel <emmanuel.blondel@fao.org>
+# Authors:
+#	Emmanuel Blondel <emmanuel.blondel@fao.org>
+# 	Norbert Billet <norbert.billet@ird.fr>
 #
 # Description: provides a set of utility R functions
 # Creation Date: 2013/11/14
