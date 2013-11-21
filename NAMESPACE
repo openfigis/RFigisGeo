@@ -5,6 +5,7 @@ import(rgeos)
 import(dplR)
 
 export(
+	findP4s,
 	readWFS,
 	exportFeatures,
 	getIntersection
