@@ -6,6 +6,52 @@
 # Revision Date: -
 #=======================
 
+# Find a proj4 definition from a srsName
+#
+# Arguments:
+# - srsName: name of the spatial reference system
+# - morphToESRI: use the ESRI WKT representation
+# Value:
+#  List of proj4 defnitions where the WKT GEOGCS attribute is equal to the required srsName
+#
+# Comment:
+#  We actually except lat/long coordinates systems due to confusion in output of different WFS vendors
+#
+findP4s <- function(srsName, morphToESRI=FALSE) {
+  
+  if (missing(srsName)) {
+    stop("please provide a spatial reference system name")
+  }
+  #we remove the latlong proj for compatibility with sp
+  proj.lst <- as.character(projInfo("proj")$name)
+  proj.lst <- proj.lst[proj.lst != "latlong" & proj.lst != "latlon"]
+  #build combinations of know proj and datum
+  proj.datum.grd <- expand.grid(proj=proj.lst, datum=as.character(projInfo("datum")$name), stringsAsFactors=FALSE)
+  #function to ask WKT representation
+  getShowWkt <- function(x) {
+    res <- try(showWKT(paste("+proj=", x[1], " +datum=", x[2], sep=""), morphToESRI=morphToESRI), silent=TRUE)
+    if (class(res) == "try-error") {
+      return(NA)
+    } else {
+      return(res)
+    }
+  }
+  #ask WKT for all projection
+  GCS <- apply(proj.datum.grd, 1, FUN=getShowWkt)
+  
+  GCS.df <- data.frame(proj=proj.datum.grd$proj, datum=proj.datum.grd$datum, WKT=GCS, stringsAsFactors=FALSE)
+  #keep only valids
+  GCS.df <- GCS.df[! is.na(GCS.df$WKT),]
+  #the pattern to find
+  pattern <- paste("GEOGCS[\"", srsName, "\"", sep="")
+  #search for pattern
+  GCS.df <- GCS.df[substr(tolower(GCS.df$WKT), 1, nchar(pattern)) == tolower(pattern),]
+  #keep only first SRS in case of identical WKT representation
+  GCS.df <- GCS.df[!duplicated(GCS.df$WKT),]
+  #return the proj4 definition
+  return(paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep=""))
+}
+
 # Read WFS & returns a sp object
 #
 # Arguments:
@@ -15,38 +61,6 @@
 # - gmlIdAttributeName: specific to GML, the name of the ID attribute, by default "gml_id"
 #
 #
-findP4s <- function(gcsName, morphToESRI=FALSE) {
-  
-  if (missing(gcsName)) {
-    stop("please provide a geographical coordinate system name")
-  }
-  #we remove the latlong proj for compatibility with sp
-  proj.lst <- as.character(projInfo("proj")$name)
-  proj.lst <- proj.lst[proj.lst != "latlong" & proj.lst != "latlon"]
-  #build combinations of know proj and datum
-  proj.datum.grd <- expand.grid(proj=proj.lst, datum=as.character(projInfo("datum")$name), stringsAsFactors=FALSE)
-  #function to ask WKT representation
-  getShowWkt <- function(x) {
-    res <- try(showWKT(paste("+proj=", x[1], " +datum=", x[2], sep=""), morphToESRI=TRUE), silent=TRUE)
-    if (class(res) == "try-error") {
-      return(NA)
-    } else {
-      return(res)
-    }
-  }
-  #ask WKT for all projection
-  GCS <- apply(proj.datum.grd, 1,  FUN=getShowWkt)
-  
-  GCS.df <- data.frame(proj=proj.datum.grd$proj, datum=proj.datum.grd$datum, WKT=GCS, stringsAsFactors=FALSE)
-  GCS.df <- GCS.df[! is.na(GCS.df$WKT),]
-  
-  pattern <- paste("GEOGCS[\"", gcsName, "\"", sep="")
-  GCS.df <- GCS.df[substr(tolower(GCS.df$WKT), 1, nchar(pattern)) == tolower(pattern),]
-  GCS.df <- GCS.df[!duplicated(GCS.df$WKT),]
-  GCS.df$p4s <- paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep="")
-  return(paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep=""))
-}
-
 readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
 	
 	#request
