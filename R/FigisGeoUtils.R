@@ -15,6 +15,38 @@
 # - gmlIdAttributeName: specific to GML, the name of the ID attribute, by default "gml_id"
 #
 #
+findP4s <- function(gcsName, morphToESRI=FALSE) {
+  
+  if (missing(gcsName)) {
+    stop("please provide a geographical coordinate system name")
+  }
+  #we remove the latlong proj for compatibility with sp
+  proj.lst <- as.character(projInfo("proj")$name)
+  proj.lst <- proj.lst[proj.lst != "latlong" & proj.lst != "latlon"]
+  #build combinations of know proj and datum
+  proj.datum.grd <- expand.grid(proj=proj.lst, datum=as.character(projInfo("datum")$name), stringsAsFactors=FALSE)
+  #function to ask WKT representation
+  getShowWkt <- function(x) {
+    res <- try(showWKT(paste("+proj=", x[1], " +datum=", x[2], sep=""), morphToESRI=TRUE), silent=TRUE)
+    if (class(res) == "try-error") {
+      return(NA)
+    } else {
+      return(res)
+    }
+  }
+  #ask WKT for all projection
+  GCS <- apply(proj.datum.grd, 1,  FUN=getShowWkt)
+  
+  GCS.df <- data.frame(proj=proj.datum.grd$proj, datum=proj.datum.grd$datum, WKT=GCS, stringsAsFactors=FALSE)
+  GCS.df <- GCS.df[! is.na(GCS.df$WKT),]
+  
+  pattern <- paste("GEOGCS[\"", gcsName, "\"", sep="")
+  GCS.df <- GCS.df[substr(tolower(GCS.df$WKT), 1, nchar(pattern)) == tolower(pattern),]
+  GCS.df <- GCS.df[!duplicated(GCS.df$WKT),]
+  GCS.df$p4s <- paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep="")
+  return(paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep=""))
+}
+
 readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
 	
 	#request
@@ -35,35 +67,39 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 		}
 				
 		# get the Spatial Reference System (SRS)
-		xmlfile<-xmlTreeParse(destfile,useInternalNodes = TRUE)
-		feat <-xmlChildren(getNodeSet(xmlfile,paste('//','gml:featureMember', sep=''))[[1]])[[1]]
-		ns <-unlist(strsplit(xmlName(feat, full = T),':'))[1]
-		node<-getNodeSet(xmlfile, paste("//", ns, ":the_geom/*",sep=""))
-		if(length(node) == 0){
-			node<-getNodeSet(xmlfile, paste("//", ns, ":THE_GEOM/*",sep="")) #try with uppercase geom name (case of Oracle datastore layers)
-		}
-		node <- xmlRoot(xmlDoc(node[[1]]))
-		srsName <- xmlGetAttr(node, "srsName")
-	
-		#srsName patterns matching
 		srs <- NA
-		srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
-		if(length(regexpr(srsPattern, srsName, ignore.case = T)) == 1){
-			epsg <- unlist(strsplit(srsName, srsPattern))[2]
-			srs <- paste("+init=epsg:", epsg, sep="")
-		}else{
-			srsPattern = "urn:EPSG" #match case 2
-			if(length(regexpr(srsPattern, srsName, ignore.case = T)) == 1){
-				srsStr <- unlist(strsplit(srsName, ":"))
-				epsg <- srsStr[length(srsStr)]
-				srs <- paste("+init=epsg:", epsg, sep="")
-			}else{
-				#TODO match case 3
-				#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
-				#if yes set srs with the corresponding proj4string
-
-			}
-		}
+		xmlfile<-xmlTreeParse(destfile, useInternalNodes = TRUE)
+		srsName <- getNodeSet(xmlfile, "(//gml:featureMember//@srsName)[1]")
+    
+    if (length(srsName) == 1) {
+      srsName <- as.character(srsName[[1]])
+      
+  		#srsName patterns matching		
+  		srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
+  		if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
+  			epsg <- unlist(strsplit(srsName, srsPattern))[2]
+  			srs <- paste("+init=epsg:", epsg, sep="")
+  		}else{
+  			srsPattern = "urn:EPSG" #match case 2
+  			if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
+  				srsStr <- unlist(strsplit(srsName, ":"))
+  				epsg <- srsStr[length(srsStr)]
+  				srs <- paste("+init=epsg:", epsg, sep="")
+  			}else{
+  				#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
+  				#if yes set srs with the corresponding proj4string
+          #first search without any consideration of the ESRI representation
+  				srs <- findP4s(srsName, morphToESRI=FALSE)
+          if (length(srs) == 0) {
+            #if not found search with consideration of the ESRI representation
+            srs <- findP4s(srsName, morphToESRI=TRUE)
+          }
+  				if (! length(srs) == 1) {
+  				  srs <- NA
+  				}
+  			}
+  		}
+    }
 		
 		if(is.na(srs)){
 			warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
