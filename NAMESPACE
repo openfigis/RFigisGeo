@@ -8,6 +8,5 @@ export(
 	findP4s,
 	readWFS,
 	exportFeatures,
-	getIntersection,
-  getIntersectionNono
+	getIntersection
 )

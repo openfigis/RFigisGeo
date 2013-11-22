@@ -17,84 +17,43 @@
 # Notes:
 # - only supported for GML2 for now
 #
-getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id", areaCRS = NULL){
-
-	#check CRS
-	if(proj4string(features1) != proj4string(features2)){
-		print("CRS differ, try to project the second feature collection")
-		features2 <- spTransform(features2, CRS(proj4string(features1)));		
-	}
-	
-	#prepare schema (for attributes)
-	dfText = "attrs <- data.frame("
-	dfText <- paste(dfText, "ID=character(0)", sep="")
-	data1 <- features1@data
-	for(i in 1:length(colnames(data1))){
-		if(colnames(data1)[i] != gmlIdAttributeName){
-			clazz <- class(data1[,i])
-			if(clazz != "factor"){
-				clazz <- paste(clazz, "(0)", sep="")
-			}else{
-				clazz <- paste(clazz, "()", sep="")
-			}
-			dfText <-paste(dfText, ",", colnames(data1)[i], "=",clazz, sep="")
-		}
-	}
-	data2 <- features2@data
-	for(i in 1:length(colnames(data2))){
-		if(colnames(data2)[i] != gmlIdAttributeName){
-			clazz <- class(data1[,i])
-			if(clazz != "factor"){
-				clazz <- paste(clazz, "(0)", sep="")
-			}else{
-				clazz <- paste(clazz, "()", sep="")
-			}
-			dfText <-paste(dfText, ",", colnames(data2)[i], "=",clazz, sep="")
-		}
-	}
-	dfText <- paste(dfText, ",INT_AREA=numeric(0)", sep="") # add intersection area as attribute
-	dfText <- paste(dfText, ")", sep="") #close schema preparation
-	eval(parse(text=dfText))
-	featureType <- gsub("\\.", "_", colnames(attrs))
-	
-	#compute the intersection
-	intersects <- list()
-	for (i in 1:nrow(features1)) {
-		for (j in 1:nrow(features2)) {
-			ID <- sprintf("%s_x_%s", features1@data[i,gmlIdAttributeName], features2@data[j,gmlIdAttributeName])
-			intersection <- gIntersection(features1[i,], features2[j,])
-			
-			if(!is.null(intersection)){
-				obj <- Polygons(slot(slot(intersection, "polygons")[[1]], "Polygons"), ID = ID)
-				if(!is.null(areaCRS)){
-					slot(obj, "area") <- gArea(spTransform(intersection, areaCRS))
-				}
-				intersects[[ID]] <- obj
-				drop <- c(gmlIdAttributeName)
-				attrs <- rbind(
-							attrs,
-							cbind(
-								ID,
-								features1[i,]@data[, !(colnames(data1) %in% drop)],
-								features2[j,]@data[, !(colnames(data2) %in% drop)],
-								slot(obj, "area"))
-						)
-			}
-		}
-	}
-	#encapsulate Polygons in a SpatialPolygons object
-	spdf <- NULL
-	if(length(intersects) > 0){
-		sp <- SpatialPolygons(intersects, proj4string = CRS(proj4string(features1)))
-		
-		#prepare attributes data.frame
-		colnames(attrs) <- featureType
-		row.names(attrs) <- attrs$ID
-		
-		#join attributes to features
-		id <- match(sapply(slot(sp, "polygons"), function(x) slot(x,"ID")), row.names(attrs))
-		spdf <- SpatialPolygonsDataFrame(sp[!is.na(id),],attrs[id[!is.na(id)],],match.ID=TRUE)
-		
-	}
-	return(spdf);
+getIntersection <- function(features1, features2, gmlIdAttributeName="gml_id", areaCRS){
+  
+  #check CRS
+  if(proj4string(features1) != proj4string(features2)){
+    print("CRS differ, try to project the second feature collection")
+    features2 <- spTransform(features2, CRS(proj4string(features1)));  	
+  }
+  
+  #compute the intersection possibility
+  features.intersects <- gIntersects(features1, features2, byid=TRUE)
+  #keep only relevant data
+  features1 <- features1[apply(features.intersects, 2, function(x) {sum(x)}) > 0, ]
+  features2 <- features2[apply(features.intersects, 1, function(x) {sum(x)}) > 0, ]
+  #compute the intersection
+  intersection <- gIntersection(features1, features2, byid=TRUE)
+  
+  intersection.structure <- data.frame(features1=colnames(features.intersects)[as.vector(col(features.intersects))], 
+                                       features2=rownames(features.intersects)[as.vector(row(features.intersects))], 
+                                       inter=c(features.intersects), 
+                                       stringsAsFactors=FALSE)
+  
+  intersection.structure <- intersection.structure[intersection.structure$inter,]
+  ID <- paste(intersection.structure$features1, "_x_", intersection.structure$features2, sep="")
+  intersection <- spChFIDs(intersection, ID)
+  
+  merge.df <- merge(merge(features1@data, intersection.structure, by.x=gmlIdAttributeName, by.y="features1"), features2@data, by.x="features2", by.y=gmlIdAttributeName)
+  rownames(merge.df) <- paste(merge.df[, gmlIdAttributeName], "_x_", merge.df$features2, sep="")
+  merge.df$features2 <- NULL
+  merge.df[, gmlIdAttributeName] <- NULL
+  merge.df$inter <- NULL
+  merge.df$ID <- ID
+  
+  if( ! missing(areaCRS)) {
+    merge.df$custom_area <- gArea(spTransform(intersection, areaCRS, byid=TRUE))
+  }
+  
+  spdf <- SpatialPolygonsDataFrame(Sr=intersection, data=merge.df, match.ID=TRUE)
+  
+  return(spdf);
 }
