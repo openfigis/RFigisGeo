@@ -3,6 +3,7 @@ import(sp)
 import(rgdal)
 import(rgeos)
 import(dplR)
+import(RCurl)
 
 export(
 	findP4s,
