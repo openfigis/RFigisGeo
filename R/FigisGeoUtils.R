@@ -178,7 +178,7 @@ exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NUL
 		outputFile <- paste(file.path, "/", file.name, ".zip", sep="")
 		
 	}else if(outputFormat == "GML"){
-		writeOGR(rfeatures, file.path, file.name, driver="GML")
+		writeOGR(features, file.path, file.name, driver="GML")
 		outputFile <- paste(file.path, "/", file.name, ".gml", sep="")
 	}else{
 		stop("Unsupported output format")
