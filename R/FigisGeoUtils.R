@@ -161,28 +161,30 @@ exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NUL
 		file.name <- uuid
 	}
 	if(is.null(file.path)){
-		file.path <- paste(tempdir(),"/",uuid,sep="")
+		file.path <- file.path(tempdir(),uuid)
+		dir.create(file.path)
 	}
 	
 	#manage output formats
 	if(outputFormat == "SHAPE-ZIP"){
 		writeOGR(features, file.path, file.name, driver="ESRI Shapefile")
-		zip_path<-paste(file.path,"/",file.name,".zip",sep="")
+		outputFile<-paste(file.path,"/",file.name,".zip",sep="")
 		shapefiles <- list.files(file.path, pattern = file.name, full.names=TRUE)
-		zip(zipfile=zip_path, flags="-r9Xj", files=shapefiles) # requires R_ZIPCMD to be set in linux OS.
-		
-		if (! file.exists(zip_path)) {
-			zip_path <- NA
-			stop("Error when creating zip file")
-		}
-		outputFile <- paste(file.path, "/", file.name, ".zip", sep="")
+		zip(zipfile=outputFile, flags="-r9Xj", files=shapefiles) # requires R_ZIPCMD to be set in linux OS.
 		
 	}else if(outputFormat == "GML"){
-		writeOGR(features, file.path, file.name, driver="GML")
 		outputFile <- paste(file.path, "/", file.name, ".gml", sep="")
+		writeOGR(features, dsn = outputFile, layer = file.name, driver="GML")
+		
 	}else{
 		stop("Unsupported output format")
 	}
+	
+	if (!file.exists(outputFile)) {
+		outputFile <- NA
+		stop("Error when creating ", outputFormat)
+	}
+	
 	return(outputFile)
 }
 
