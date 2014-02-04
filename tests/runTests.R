@@ -1,1 +1,1 @@
-BiocGenerics:::testPackage("RFigisGeo")
+testthat::test_package("RFigisGeo")

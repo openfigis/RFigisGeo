@@ -2,33 +2,36 @@
 # Authors:
 #	Emmanuel Blondel <emmanuel.blondel@fao.org>
 #
-# Description: RUnit tests for FigisGeoUtils
+# Description: Unit tests for FigisGeoUtils
 # Creation Date: 2014/01/30
 # Revision Date: -
 #=======================
+require(RFigisGeo, quietly = TRUE)
+require(testthat)
+context("Utils")
 
-require(sp)
+test_that("findP4s",{
+	p1 = findP4s("GCS_WGS_1984", morphToESRI=TRUE)
+	p2 = findP4s("GCS_WGS_1984", morphToESRI=FALSE)
+	expect_equal(p1, "+proj=longlat +datum=WGS84")
+	expect_equal(p2, NA)
+})
 
-test_findP4s = function(){
-	checkEquals(findP4s("GCS_WGS_1984", morphToESRI=TRUE), "+proj=longlat +datum=WGS84")
-	checkEquals(findP4s("GCS_WGS_1984", morphToESRI=FALSE), NA)
-}
-
-test_readWFS = function(){
+test_that("readWFS",{
 	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR"
 	features = readWFS(wfsRequest)
-	checkEquals(typeof(features), "S4")
-	checkEquals(class(features)[1], "SpatialPolygonsDtFrame")
-	checkEquals(length(features), 19L)
-}
+	expect_equal(typeof(features), "S4")
+	expect_is(features, "SpatialPolygonsDataFrame")
+	expect_equal(length(features), 19L)
+})
 
-test_exportFeatures = function(){
+test_that("exportFeatures",{
 	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR"
 	features = readWFS(wfsRequest)
 	out1 = exportFeatures(features, outputFormat="SHAPE-ZIP")
-	checkTrue(file.exists(out1))
+	expect_true(file.exists(out1))
 	out2 = exportFeatures(features, outputFormat="GML")
-	checkTrue(file.exists(out2))
-}
+	expect_true(file.exists(out2))
+})
 
 
