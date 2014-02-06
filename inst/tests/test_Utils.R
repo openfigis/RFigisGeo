@@ -25,6 +25,13 @@ test_that("readWFS",{
 	expect_equal(length(features), 19L)
 })
 
+test_that("readWFS - geometryless",{
+	wfsRequest = "http://www.fao.org/figis/geoserver/GeoRelationship/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=GeoRelationship:FAO_AREAS_x_EEZ_HIGHSEAS&maxFeatures=50";
+	df = readWFS(wfsRequest)
+	expect_is(df, "data.frame")
+	expect_equal(nrow(df), 50L)
+})
+
 test_that("exportFeatures",{
 	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR"
 	features = readWFS(wfsRequest)

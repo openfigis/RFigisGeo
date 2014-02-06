@@ -85,56 +85,71 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 		
 		tempf = tempfile() 
 		destfile = paste(tempf,".gml",sep='')
-    saveXML(xmlfile, destfile)
+    	saveXML(xmlfile, destfile)
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- ogrListLayers(destfile)
 		if (length(layername) != 1) {
 			stop("Mistake with layers in the input dataset")
 		}
-		# get the Spatial Reference System (SRS)
-		srs <- NA
-		#xmlfile<-xmlTreeParse(destfile, useInternalNodes = TRUE)
-		srsName <- getNodeSet(xmlfile, "(//gml:featureMember//@srsName)[1]")
-		if (length(srsName) == 1) {
-			srsName <- as.character(srsName[[1]])
+		
+		hasGeometry = ((length(getNodeSet(xmlfile, "//gml:featureMember//gml:coordinates")) > 0)
+						|| (length(getNodeSet(xmlfile, "//gml:featureMember//gml:pos")) > 0)
+						|| (length(getNodeSet(xmlfile, "//gml:featureMember//gml:posList")) > 0))
+		if(hasGeometry){
 			
-			#srsName patterns matching		
-			srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
-			if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
-				epsg <- unlist(strsplit(srsName, srsPattern))[2]
-				srs <- paste("+init=epsg:", epsg, sep="")
-			}else{
-				srsPattern = "urn:(x-)?ogc:def:crs:EPSG" #match case 2
+			# get the Spatial Reference System (SRS)
+			srs <- NA
+			#xmlfile<-xmlTreeParse(destfile, useInternalNodes = TRUE)
+			srsName <- getNodeSet(xmlfile, "(//gml:featureMember//@srsName)[1]")
+			if (length(srsName) == 1) {
+				srsName <- as.character(srsName[[1]])
+				
+				#srsName patterns matching		
+				srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
 				if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
-					srsStr <- unlist(strsplit(srsName, ":"))
-					epsg <- srsStr[length(srsStr)]
+					epsg <- unlist(strsplit(srsName, srsPattern))[2]
 					srs <- paste("+init=epsg:", epsg, sep="")
 				}else{
-					#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
-					#if yes set srs with the corresponding proj4string
-					#first search without any consideration of the ESRI representation
-					srs <- findP4s(srsName, morphToESRI=FALSE)
-					if (is.na(srs)) {
-						#if not found search with consideration of the ESRI representation
-						srs <- findP4s(srsName, morphToESRI=TRUE)
-					}
-					if (! is.na(srs) && ! length(srs) == 1) {
-						srs <- NA
+					srsPattern = "urn:(x-)?ogc:def:crs:EPSG" #match case 2
+					if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
+						srsStr <- unlist(strsplit(srsName, ":"))
+						epsg <- srsStr[length(srsStr)]
+						srs <- paste("+init=epsg:", epsg, sep="")
+					}else{
+						#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
+						#if yes set srs with the corresponding proj4string
+						#first search without any consideration of the ESRI representation
+						srs <- findP4s(srsName, morphToESRI=FALSE)
+						if (is.na(srs)) {
+							#if not found search with consideration of the ESRI representation
+							srs <- findP4s(srsName, morphToESRI=TRUE)
+						}
+						if (! is.na(srs) && ! length(srs) == 1) {
+							srs <- NA
+						}
 					}
 				}
+			}	
+			
+			if(is.na(srs)){
+				warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
 			}
-		}
-		
-		if(is.na(srs)){
-			warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
-		}
-		
-		if (missing(p4s)){
-			features = readOGR(destfile, layername, p4s = srs, disambiguateFIDs=TRUE)
+			
+			if (missing(p4s)){
+				features = readOGR(destfile, layername, p4s = srs, disambiguateFIDs=TRUE)
+			}else{
+				features = readOGR(destfile, layername, p4s = p4s, disambiguateFIDs=TRUE)
+			}
+			features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+			
 		}else{
-			features = readOGR(destfile, layername, p4s = p4s, disambiguateFIDs=TRUE)
+			membersContent <- sapply(getNodeSet(xmlfile, "//gml:featureMember"), function(x) xmlChildren(x))
+			fid <- sapply(membersContent, function(x) xmlAttrs(x))
+			membersAttributes <- xmlToDataFrame(nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"))
+			features <- cbind(fid, membersAttributes)
+			
 		}
-		features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName]))      	
+		     	
 	}else{
 		stop("Unsupported WFS format")
 	}
