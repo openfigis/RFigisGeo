@@ -1,4 +1,4 @@
-# FigisGeoUtils.R
+# Utils.R
 # Authors:
 #	Emmanuel Blondel <emmanuel.blondel@fao.org>
 # 	Norbert Billet <norbert.billet@ird.fr>

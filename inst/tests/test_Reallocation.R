@@ -1,7 +1,7 @@
 # test_Reallocation.R
 # Author: Emmanuel Blondel <emmanuel.blondel@fao.org>
 #
-# Description: Unit tests for FigisGeoUtils
+# Description: Unit tests for SPREAD algorithm
 # Creation Date: 2014/02/06
 # Revision Date: -
 #=======================

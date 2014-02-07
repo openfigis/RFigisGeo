@@ -1,7 +1,7 @@
 # Reallocation.R
 # Author: Emmanuel Blondel <emmanuel.blondel@fao.org>
 #
-# Description: Spatial REAllocation of statistical Data algorithm (SPREAD)
+# Description: Spatial REAllocation of statistical Data (SPREAD) algorithm 
 # Creation Date: 2014/02/06
 #=======================
 

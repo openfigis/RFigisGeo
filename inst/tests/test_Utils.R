@@ -2,7 +2,7 @@
 # Authors:
 #	Emmanuel Blondel <emmanuel.blondel@fao.org>
 #
-# Description: Unit tests for FigisGeoUtils
+# Description: Unit tests for Utils functions
 # Creation Date: 2014/01/30
 # Revision Date: -
 #=======================
