@@ -16,11 +16,29 @@ test_that("Reallocation",{
 	colnames(dfdata) <- c("dim1","dim2","area","value")
 			
 	#test intersections data
-	intersections <- data.frame(cbind(c(rep("src1",5),rep("src2",3)),c(c("trg1","trg2","trg3","trg4","trg5"),c("trg3","trg2","trg5")),c(c(45,367,123.45,789.34,34.2),c(23.56, 676.89, 345.34))))
-	colnames(intersections) <- c("area1","area2","intersect")		
+	intersections <- data.frame(
+						cbind(
+							c(rep("src1",5),rep("src2",3)),
+							c(c("trg1","trg2","trg3","trg4","trg5"),c("trg3","trg2","trg5")),
+							c(rep("d1_v1",3),rep("d1_v2",2),rep("d1_v2", 3)),
+							c(0.8, 0.56, 0.45, 0.2, 0.43, 0.89, 0.3, 0.98),
+							c(c(45,367,123.45,789.34,34.2),c(23.56, 676.89, 345.34))
+						)
+					)
+	colnames(intersections) <- c("area1","area2","dim1","d1_prob","intersect")		
 			
 	#perform reallocation test
-	spread <- reallocate(dfdata,intersections,"area","area1","value","intersect")
+	spread <- reallocate(
+				x = dfdata,
+				y = intersections,
+				area.x = "area",
+				area.y = "area1",
+				by.x = "dim1",
+				by.y = "dim1",
+				data = "value",
+				warea = "intersect",
+				wprob = "d1_prob"
+			  )
 	expect_is(spread,"data.frame")
 	sapply(unique(spread[,"value"]),
 		function(x){
