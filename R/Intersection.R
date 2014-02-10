@@ -59,11 +59,11 @@ getIntersection <- function(features1, features2, gmlIdAttributeName=c("gml_id",
   #compute areas if no areaCRS is provided or if an valid areaCRS is provided. i.e. areas are not computed if areaCRS=NA
   withArea <- FALSE
   if (missing(areaCRS)) {
-    area.df <- data.frame(area_custom=gArea(features.intersection, byid=TRUE))
+    area.df <- data.frame(geo_area=gArea(features.intersection, byid=TRUE))
     withArea <- TRUE
   } else {
     if (class(areaCRS) == "CRS") {
-      area.df <- data.frame(area_custom=gArea(spTransform(features.intersection, areaCRS), byid=TRUE))
+      area.df <- data.frame(geo_area=gArea(spTransform(features.intersection, areaCRS), byid=TRUE))
       withArea <- TRUE
     }
   }
