@@ -3,6 +3,7 @@
 #
 # Description: Spatial REAllocation of statistical Data (SPREAD) algorithm 
 # Creation Date: 2014/02/06
+# Revision Date: 2014/02/13
 #=======================
 
 # Computes a spatial reallocation of statistics
@@ -19,7 +20,7 @@
 # - warea: name of the y-field representing the intersecting surface
 # - wprob: name of the y-field representing an additional probability value. NULL by default
 #
-reallocate <- function(x, y, area.x, area.y, by.x, by.y, data, warea, wprob = NULL){
+reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea, wprob = NULL){
 	
 	#probability weight
 	if(is.null(wprob)){
@@ -29,9 +30,18 @@ reallocate <- function(x, y, area.x, area.y, by.x, by.y, data, warea, wprob = NU
 	}
 	
 	#pre-calculations
-	if(is.factor(y[,warea])) y[,warea] <- as.numeric(levels(y[,warea]))
-	precalc <- cbind(y, w = prob * y[,warea])
-	wkey <- paste("(",apply(precalc[,c(area.y, by.y)], 1L, paste,collapse=","),")",sep="")
+	if(is.factor(y[,warea])) y[,warea] <- as.numeric(as.character(y[,warea]))
+	precalc <- cbind(y, w = prob * y[,warea])	
+	names.x <- area.x
+	names.y <- area.y
+	if(!is.null(by.x)) names.x <- c(names.x, by.x)
+	if(!is.null(by.y)) names.y <- c(names.y, by.y)
+	if(length(names.y) == 1){
+		key <- precalc[,names.y]
+	}else{
+		key <- apply(precalc[,names.y], 1L, paste,collapse=",")
+	}
+	wkey <- paste("(",key,")",sep="")
 	precalc <- cbind(precalc, wkey)
 	wsum <- unlist(lapply(unique(precalc[, "wkey"]),
 					function (x) {
@@ -43,8 +53,8 @@ reallocate <- function(x, y, area.x, area.y, by.x, by.y, data, warea, wprob = NU
 	precalc <- cbind(precalc, wsum)
 	
 	#merge & reallocate
-	if(is.factor(x[,data])) x[,data] <- as.numeric(levels(x[,data]))
-	df <- merge(x = x, y = precalc, by.x = c(area.x, by.x), by.y = c(area.y, by.y))
+	if(is.factor(x[,data])) x[,data] <- as.numeric(as.character(x[,data]))
+	df <- merge(x = x, y = precalc, by.x = names.x, by.y = names.y)
 	spread <- df[,data] * df$w / df$wsum
 	result <- cbind(df, spread)
 	return(result)
