@@ -43,14 +43,13 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 	}
 	wkey <- paste("(",key,")",sep="")
 	precalc <- cbind(precalc, wkey)
-	wsum <- unlist(lapply(unique(precalc[, "wkey"]),
+	precalc <- do.call("rbind", lapply(unique(precalc[, "wkey"]),
 					function (x) {
 						isubset <- precalc[precalc[,"wkey"] == x,]
-						wsum <- sum(isubset$w)
-						rep(wsum, nrow(isubset))
+						wsum <- rep(sum(isubset$w),nrow(isubset))
+						cbind(isubset,wsum)
 					}							
 			))
-	precalc <- cbind(precalc, wsum)
 	
 	#merge & reallocate
 	if(is.factor(x[,data])) x[,data] <- as.numeric(as.character(x[,data]))
