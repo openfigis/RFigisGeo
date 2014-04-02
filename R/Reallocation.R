@@ -3,7 +3,7 @@
 #
 # Description: Spatial REAllocation of statistical Data (SPREAD) algorithm 
 # Creation Date: 2014/02/06
-# Revision Date: 2014/02/13
+# Revision Date: 2014/04/02
 #=======================
 
 # Computes a spatial reallocation of statistics
@@ -26,11 +26,23 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 	if(is.null(wprob)){
 		prob <- rep(1L, nrow(y))
 	}else{
-		prob <- as.numeric(levels(y[,wprob]))
+		if(!is.numeric(y[,wprob])){
+			prob <- switch(class(y[,wprob]),
+				"character" = as.numeric(y[,wprob]),
+				"factor" = as.numeric(as.character(y[,wprob]))
+			)
+		}else{
+			prob <- y[,wprob]
+		}
 	}
 	
 	#pre-calculations
-	if(is.factor(y[,warea])) y[,warea] <- as.numeric(as.character(y[,warea]))
+	if(!is.numeric(y[,warea])){
+		y[,warea] <- switch(class(y[,warea]),
+			"character" = as.numeric(y[,warea]),
+			"factor" = as.numeric(as.character(y[,warea]))
+		)
+	}
 	precalc <- cbind(y, w = prob * y[,warea])	
 	names.x <- area.x
 	names.y <- area.y
@@ -52,7 +64,12 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 			))
 	
 	#merge & reallocate
-	if(is.factor(x[,data])) x[,data] <- as.numeric(as.character(x[,data]))
+	if(!is.numeric(x[,data])){
+		x[,data] <- switch(class(x[,data]),
+				"character" = as.numeric(x[,data]),
+				"factor" = as.numeric(as.character(x[,data]))
+		)
+	}
 	df <- merge(x = x, y = precalc, by.x = names.x, by.y = names.y)
 	spread <- df[,data] * df$w / df$wsum
 	result <- cbind(df, spread)
