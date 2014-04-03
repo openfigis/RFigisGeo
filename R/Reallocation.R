@@ -19,8 +19,9 @@
 # - data: name of the x-field representing the numerical values to reallocate
 # - warea: name of the y-field representing the intersecting surface
 # - wprob: name of the y-field representing an additional probability value. NULL by default
+# - aggregates : name(s) of the y-field(s) that represent to target geographic dimension
 #
-reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea, wprob = NULL){
+reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea, wprob = NULL, aggregates = NULL){
 	
 	#probability weight
 	if(is.null(wprob)){
@@ -73,5 +74,18 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 	df <- merge(x = x, y = precalc, by.x = names.x, by.y = names.y)
 	spread <- df[,data] * df$w / df$wsum
 	result <- cbind(df, spread)
+	
+	#aggregate data by target
+	if(!is.null(aggregates)){
+		keys <- c(aggregates, names(data)[!(names(data) %in% c(area.x, data))])
+		keyNames <- c(keys, "spreadValue")
+		if(area.y %in% aggregates){
+			keys <- c(area.x, keys[keys != area.y])
+			keyNames <- c(area.y, keys[keys != area.x], "spreadValue")
+		}
+		result <- aggregate(result$spread, by = as.list(result[keys]), FUN = "sum")
+		colnames(result) <- keyNames
+	}
+	
 	return(result)
 }
