@@ -77,7 +77,7 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 	
 	#aggregate data by target
 	if(!is.null(aggregates)){
-		keys <- c(aggregates, names(data)[!(names(data) %in% c(area.x, data))])
+		keys <- c(aggregates, names(x)[!(names(x) %in% c(area.x, data))])
 		keyNames <- c(keys, "spreadValue")
 		if(area.y %in% aggregates){
 			keys <- c(area.x, keys[keys != area.y])
