@@ -51,13 +51,13 @@ findP4s <- function(srsName, morphToESRI=FALSE) {
 	GCS.df <- GCS.df[substr(tolower(GCS.df$WKT), 1, nchar(pattern)) == tolower(pattern),]
 	#keep only first SRS in case of identical WKT representation
 	GCS.df <- GCS.df[!duplicated(GCS.df$WKT),]
-  if (nrow(GCS.df) > 0) {
-    #return the proj4 definition
-    return(paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep=""))  
-  } else {
-    #not found, return NA
-    return(NA)
-  }	
+	if (nrow(GCS.df) > 0) {
+    		#return the proj4 definition
+    		return(paste("+proj=", GCS.df$proj, " +datum=", GCS.df$datum, sep=""))  
+  	} else {
+    		#not found, return NA
+    		return(NA)
+  	}	
 }
 
 # Read WFS & returns a sp object
@@ -78,14 +78,14 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 	}
 	
 	if(outputFormat == "GML") {
-	  # download the data
-    content <- getURL(wfsRequest)
-    xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
-    #write the file to disk
-		
+	  	# download the data
+    		content <- getURL(wfsRequest)
+    		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
+    		
+    		#write the file to disk
 		tempf = tempfile() 
 		destfile = paste(tempf,".gml",sep='')
-    	saveXML(xmlfile, destfile)
+    		saveXML(xmlfile, destfile)
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- ogrListLayers(destfile)
 		if (length(layername) != 1) {
