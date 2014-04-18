@@ -78,14 +78,17 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 	}
 	
 	if(outputFormat == "GML") {
-	  	# download the data
-    		content <- getURL(wfsRequest)
-    		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
-    		
-    		#write the file to disk
+		# download the data
+		percentCodes <- "%20"
+		names(percentCodes) <- "\x20"
+		content <- getURL(curlPercentEncode(x = wfsRequest, codes = percentCodes))
+		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
+		
+		#write the file to disk
 		tempf = tempfile() 
 		destfile = paste(tempf,".gml",sep='')
-    		saveXML(xmlfile, destfile)
+		saveXML(xmlfile, destfile)
+		
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- ogrListLayers(destfile)
 		if (length(layername) != 1) {
