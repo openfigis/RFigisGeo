@@ -29,7 +29,7 @@ findP4s <- function(srsName, morphToESRI=FALSE) {
 	proj.lst <- proj.lst[proj.lst != "latlong" & proj.lst != "latlon"]
 	#build combinations of know proj and datum
 	proj.datum.grd <- expand.grid(proj=proj.lst, datum=as.character(projInfo("datum")$name), stringsAsFactors=FALSE)
-  #remove the carthage datum which make my system crash
+  	#remove the carthage datum which make my system crash
 	proj.datum.grd <- proj.datum.grd[proj.datum.grd$datum != "carthage", ]
 	#function to ask WKT representation
 	getShowWkt <- function(x) {
