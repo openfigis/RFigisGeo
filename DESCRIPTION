@@ -1,6 +1,6 @@
 Package: RFigisGeo
-Version: 0.2
-Date: 2014-04-02
+Version: 0.2-1
+Date: 2014-04-18
 Title: A package to facilitate geoprocessing
 Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel1@gmail.com"),
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))

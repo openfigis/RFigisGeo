@@ -18,7 +18,7 @@ test_that("findP4s",{
 })
 
 test_that("readWFS",{
-	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR"
+	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR&outputFormat=text/xml; subtype=gml/2.1.2"
 	features = readWFS(wfsRequest)
 	expect_equal(typeof(features), "S4")
 	expect_is(features, "SpatialPolygonsDataFrame")
@@ -26,7 +26,7 @@ test_that("readWFS",{
 })
 
 test_that("readWFS - geometryless",{
-	wfsRequest = "http://www.fao.org/figis/geoserver/GeoRelationship/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=GeoRelationship:FAO_AREAS_x_EEZ_HIGHSEAS&maxFeatures=50";
+	wfsRequest = "http://www.fao.org/figis/geoserver/GeoRelationship/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=GeoRelationship:FAO_AREAS_x_EEZ_HIGHSEAS&maxFeatures=50&outputFormat=text/xml; subtype=gml/2.1.2";
 	df = readWFS(wfsRequest)
 	expect_is(df, "data.frame")
 	expect_equal(nrow(df), 50L)
