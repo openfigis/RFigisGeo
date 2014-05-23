@@ -68,7 +68,7 @@ getIntersection <- function(features1, features2,
     }
     if(!is.null(output)) vec[[i]] <- output 
   }
-  int.features <- do.call("rbind",vec[sapply(vec, function(x)!inherits(x, "try-error"))])
+  int.features <- do.call("rbind",vec[sapply(vec, function(x) !inherits(x, "try-error"))])
 
   rn <- row.names(int.features)
   nrn <- do.call("rbind", strsplit(rn, " "))
