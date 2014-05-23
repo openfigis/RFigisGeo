@@ -5,8 +5,8 @@ Title: A package to facilitate geoprocessing
 Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel@fao.org"),
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
-Depends: R (>= 2.15), RCurl, XML, sp, rgdal, rgeos, dplR
-Imports: methods, RCurl, XML, sp, rgdal, rgeos, dplR
+Depends: R (>= 2.15), RCurl, XML, sp, rgdal, rgeos
+Imports: methods, RCurl, XML, sp, rgdal, rgeos
 Suggests: testthat
 Description: The package hosts a set of facilitites to perform geoprocessing
 License: GPL (>= 2)
