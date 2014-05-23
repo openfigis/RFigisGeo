@@ -1,3 +1,10 @@
+import(RCurl)
+import(XML)
+import(sp)
+import(rgdal)
+import(rgeos)
+import(dplR)
+
 export(
 	findP4s,
 	readWFS,
