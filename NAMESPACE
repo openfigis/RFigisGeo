@@ -3,7 +3,7 @@ import(XML)
 import(sp)
 import(rgdal)
 import(rgeos)
-import(dplR)
+import(uuid)
 
 export(
 	findP4s,

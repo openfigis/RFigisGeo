@@ -173,8 +173,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 #
 exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NULL, file.name = NULL){
 	
-	ug <- uuid.gen()
-	uuid<-ug()
+	uuid <- UUIDgenerate()
 	if(is.null(file.name)){
 		file.name <- uuid
 	}
