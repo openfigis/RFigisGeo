@@ -6,7 +6,7 @@ Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emma
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends: R (>= 2.15), RCurl, XML, sp, rgdal, rgeos, dplR
-Imports: methods
+Imports: methods, RCurl, XML, sp, rgdal, rgeos, dplR
 Suggests: testthat
 Description: The package hosts a set of facilitites to perform geoprocessing
 License: GPL (>= 2)
