@@ -1,3 +1,4 @@
+import(methods)
 import(RCurl)
 import(XML)
 import(sp)
