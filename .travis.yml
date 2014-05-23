@@ -6,7 +6,7 @@ before_install:
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh install_aptget gdal-bin libgdal1 libgdal1-dev libproj-dev
   - ./travis-tool.sh bootstrap
-  - sudo apt-get install libgeos
+  - sudo apt-get install libgeos-dev
 install:
   - ./travis-tool.sh install_deps
 script: ./travis-tool.sh run_tests
