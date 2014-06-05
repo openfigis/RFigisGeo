@@ -1,9 +1,9 @@
 language: c
 
 before_install:
-  - sudo apt-get update -qq
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
+  - sudo apt-get update -qq
   - ./travis-tool.sh install_aptget gdal-bin libgdal1 libgdal-dev libgdal1-dev libproj-dev
   - ./travis-tool.sh bootstrap
   - sudo apt-get install libgeos-dev
