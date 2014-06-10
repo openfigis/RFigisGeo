@@ -7,6 +7,7 @@
 # Revision Date: 2013/11/18
 # Revision Date: 2013/12/05 : Improve performance
 # Revision Date: 2014/05/23: Sanitize SpatialCollections & improve performance
+# Revision Date: 2014/06/10: Improve extraction of SpatialCollection
 #===============================================================================
 
 # Computes an Intersection and returns a sp object
@@ -32,9 +33,10 @@ getIntersection <- function(features1, features2,
   }
   
   #check CRS
-  if (proj4string(features1) != proj4string(features2)) {
+  targetCRS <- proj4string(features1)
+  if (targetCRS != proj4string(features2)) {
     print("CRS differ, try to project the second feature collection")
-    features2 <- spTransform(features2, CRS(proj4string(features1)));  	
+    features2 <- spTransform(features2, CRS(targetCRS));  	
   }
   
   #target geometry obj
@@ -51,7 +53,11 @@ getIntersection <- function(features1, features2,
     baseClass1 = strsplit(baseClass1,"DataFrame")[[1]]
   if(attr(regexpr("DataFrame", class(features2)),"match.length") > 0)
     baseClass2 = strsplit(baseClass2,"DataFrame")[[1]]
-  targetGeomObj <- refs[baseClass1, baseClass2]
+  trgGeomObj <- as.character(refs[baseClass1, baseClass2])
+  trgGeomSlot <- switch(trgGeomObj,
+    "line" = c("lines","Lines"),
+    "poly" = c("polygons", "Polygons")
+  )
   
   #compute intersection predicates
   features.intersects <- gIntersects(features1, features2, byid=TRUE)
@@ -62,11 +68,18 @@ getIntersection <- function(features1, features2,
   #compute intersection geometries
   vec <- vector(mode="list", length=dim(int)[2])
   for (i in seq(along=vec)) {
-    output <- try(gIntersection(features1[i,], features2[int[,i],], byid=TRUE))
+    output <- try(gIntersection(features1[i,], features2[int[,i],], byid = TRUE))
+    
     if(class(output) == "SpatialCollections"){
-      output <- slot(output, paste(targetGeomObj, "obj", sep = ""))
+      output <- slot(output, paste(trgGeomObj, "obj", sep = ""))
+      id <- paste(row.names(features1[i,]), row.names(features2[int[,i],]), sep = " ")
+      sf = sapply(slot(output,trgGeomSlot[1]), function(x) slot(x, trgGeomSlot[2])[[1]])
+      output <- switch(trgGeomObj,
+        "line" = SpatialLines(list(Lines(sf, ID = id)), proj4string = CRS(targetCRS)),
+        "poly" = SpatialPolygons(list(Polygons(sf, ID = id)), proj4string = CRS(targetCRS))
+      )
     }
-    if(!is.null(output)) vec[[i]] <- output 
+    if(!is.null(output)) vec[[i]] <- output
   }
   int.features <- do.call("rbind",vec[sapply(vec, function(x) !inherits(x, "try-error"))])
 
