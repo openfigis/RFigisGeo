@@ -71,17 +71,22 @@ getIntersection <- function(features1, features2,
     output <- try(gIntersection(features1[i,], features2[int[,i],], byid = TRUE))
     
     if(class(output) == "SpatialCollections"){
-      output <- slot(output, paste(trgGeomObj, "obj", sep = ""))
-      id <- paste(row.names(features1[i,]), row.names(features2[int[,i],]), sep = " ")
-      sf = sapply(slot(output,trgGeomSlot[1]), function(x) slot(x, trgGeomSlot[2])[[1]])
-      output <- switch(trgGeomObj,
-        "line" = SpatialLines(list(Lines(sf, ID = id)), proj4string = CRS(targetCRS)),
-        "poly" = SpatialPolygons(list(Polygons(sf, ID = id)), proj4string = CRS(targetCRS))
-      )
+      spf <- slot(output, paste(trgGeomObj, "obj", sep = ""))
+      lapply(slot(spf, trgGeomSlot[1]), function(t){
+        sf = slot(t, trgGeomSlot[2])
+        output <- switch(trgGeomObj,
+          "line" = SpatialLines(list(Lines(sf, ID = slot(t, "ID"))), proj4string = CRS(targetCRS)),
+          "poly" = SpatialPolygons(list(Polygons(sf, ID = slot(t, "ID"))), proj4string = CRS(targetCRS))
+        )
+        
+        if(!is.null(output)) vec[[i]] <- output
+      })
+      
+    }else{
+      if(!is.null(output)) vec[[i]] <- output
     }
-    if(!is.null(output)) vec[[i]] <- output
   }
-  int.features <- do.call("rbind",vec[sapply(vec, function(x) !inherits(x, "try-error"))])
+  int.features <- do.call("rbind",vec[sapply(vec, function(x) !is.null(x) & !inherits(x, "try-error"))])
 
   rn <- row.names(int.features)
   nrn <- do.call("rbind", strsplit(rn, " "))
