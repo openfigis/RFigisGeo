@@ -64,11 +64,10 @@ getIntersection <- function(features1, features2,
   features.intersects <- gIntersects(features1, features2, byid=TRUE)
   features1 <- features1[apply(features.intersects, 2L, function(x) {sum(x)}) > 0, ]
   features2 <- features2[apply(features.intersects, 1L, function(x) {sum(x)}) > 0, ]
-  row.names(features1) <- gsub("-",".", row.names(features1))
-  row.names(features2) <- gsub("-",".", row.names(features2))
   
   int <- gIntersects(features1, features2, byid=TRUE)
   int.df <- data.frame(int)
+  colnames(int.df) <- row.names(features1)
   int.df <- cbind(feature2 = row.names(int.df), int.df)
   int.df <- reshape(int.df, direction = "long",
                     varying = list(names(int.df)[2:ncol(int.df)]),
@@ -110,7 +109,8 @@ getIntersection <- function(features1, features2,
     }
   }
   int.features <- do.call("rbind",vec[sapply(vec, function(x) !is.null(x) & !inherits(x, "try-error"))])
-
+  
+  #ids pairs
   rn <- row.names(int.features)
   nrn <- do.call("rbind", strsplit(rn, " "))
   int.id <- paste(nrn[,1], nrn[,2], sep = "_x_")
