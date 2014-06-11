@@ -78,7 +78,6 @@ getIntersection <- function(features1, features2,
   #compute intersection geometries
   vec <- vector(mode="list", length = nrow(int.df))
   for (i in seq(along=vec)) {
-    print(i)
     feat1 <- as.character(int.df[i,"feature1"])
     feat2 <- as.character(int.df[i,"feature2"])
     output <- try(
