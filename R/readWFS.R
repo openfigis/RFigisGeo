@@ -107,9 +107,12 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 		}else{
 			membersContent <- sapply(getNodeSet(xmlfile, "//gml:featureMember"), function(x) xmlChildren(x))
 			fid <- sapply(membersContent, function(x) xmlAttrs(x))
-			membersAttributes <- xmlToDataFrame(nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"))
-			features <- cbind(fid, membersAttributes)
-			
+			membersAttributes <- xmlToDataFrame(
+        nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"),
+        stringsAsFactors = FALSE
+      )
+			features <- cbind(fid, membersAttributes, stringsAsFactors = FALSE)
+      
 		}
 		     	
 	}else{
