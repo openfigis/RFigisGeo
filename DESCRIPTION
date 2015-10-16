@@ -1,14 +1,14 @@
 Package: RFigisGeo
 Version: 0.3
 Date: 2014-06-11
-Title: A package to facilitate geoprocessing
+Title: Set of geoprocessing facilities used in FIGIS
 Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel@fao.org"),
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))
 Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends: R (>= 2.15), RCurl, XML, sp, rgdal, rgeos, uuid
 Imports: methods
 Suggests: testthat
-Description: The package hosts a set of facilitites to perform geoprocessing
+Description: Set of geoprocessing facilities used in FIGIS
 License: GPL (>= 2)
 URL: https://github.com/openfigis/RFigisGeo
 BugReports: https://github.com/openfigis/RFigisGeo/issues
