@@ -11,5 +11,6 @@ export(
 	readWFS,
 	exportFeatures,
 	getIntersection,
+  toSpatialPoints,
 	reallocate
 )
