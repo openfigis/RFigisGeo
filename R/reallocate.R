@@ -1,26 +1,23 @@
-# Reallocation.R
-# Author: Emmanuel Blondel <emmanuel.blondel@fao.org>
+#' @name reallocate
+#' @title reallocate
+#' @description Computes a spatial reallocation of statistics
 #
-# Description: Spatial REAllocation of statistical Data (SPREAD) algorithm 
-# Creation Date: 2014/02/06
-# Revision Date: 2014/04/02
-#=======================
 
-# Computes a spatial reallocation of statistics
-#
-# Arguments:
-# - x: a data.frame giving statistics reported for a given area
-# - y: a data.frame giving intersections between 2 or more types of areas, the intersecting surface
-#	   and possibly a giving a probability field
-# - area.x: name of the x-field representing the source area (typically an area code)
-# - area.y: name of the y-field representing the target area (typically an area code)
-# - by.x: name(s) of optional additional x-fields to be mapped
-# - by.y: name(s) of optional additional y-fields to be mapped
-# - data: name of the x-field representing the numerical values to reallocate
-# - warea: name of the y-field representing the intersecting surface
-# - wprob: name of the y-field representing an additional probability value. NULL by default
-# - aggregates : name(s) of the y-field(s) that represent to target geographic dimension
-#
+#' @param x a data.frame giving statistics reported for a given area
+#' @param y a data.frame giving intersections between 2 or more types of areas, the intersecting surface
+#'        and possibly a giving a probability field
+#' @param area.x name of the x-field representing the source area (typically an area code)
+#' @param area.y name of the y-field representing the target area (typically an area code)
+#' @param by.x name(s) of optional additional x-fields to be mapped
+#' @param by.y name(s) of optional additional y-fields to be mapped
+#' @param data name of the x-field representing the numerical values to reallocate
+#' @param warea name of the y-field representing the intersecting surface
+#' @param wprob name of the y-field representing an additional probability value. NULL by default
+#' @param aggregates name(s) of the y-field(s) that represent to target geographic dimension
+#' @return an object of class "data.frame"
+#' 
+#' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#' 
 reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea, wprob = NULL, aggregates = NULL){
 	
 	#probability weight

@@ -1,18 +1,15 @@
-# toSpatialPoints.R
-# Authors:
-#  Emmanuel Blondel <emmanuel.blondel@fao.org>
-#
-# Creation Date: 2015/10/16
-# Revision Date: -
-#=======================
-
-# Convert a data.frame with lonlat columns to a SpatialPoints object
-#
-# Arguments:
-# - 'x' an object of class "data.frame"
-# - 'lonlat' a vector of length 2 given the lon/lat column names e.g. c("Lon","Lat")
-# - 'verbose' TRUE (by default) to display logs
-#
+#' 
+#' @name toSpatialPoints
+#' @title toSpatialPoints
+#' @description Convert a data.frame with lonlat columns to a SpatialPoints object
+#'
+#' @param x an object of class "data.frame"
+#' @param lonlat a vector of length 2 given the lon/lat column names e.g. c("Lon","Lat")
+#' @param verbose TRUE (by default) to display logs
+#' @return an object of class "SpatialPoints"
+#'
+#' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#' 
 toSpatialPoints <- function(x, lonlat, verbose = TRUE){
   if(missing(lonlat) | is.null(lonlat)) stop("Lon/Lat columns are missing")
   if(length(lonlat) != 2) stop("lonlat should be a vector of length 2")

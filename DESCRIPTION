@@ -8,7 +8,7 @@ Maintainer: Emmanuel Blondel <emmanuel.blondel1@gmail.com>
 Depends: R (>= 2.15), RCurl, XML, sp, rgdal, rgeos, uuid
 Imports: methods
 Suggests: testthat
-Description: Set of geoprocessing facilities used in FIGIS
+Description: Provides a set of geoprocessing facilities used in FIGIS.
 License: GPL (>= 2)
 URL: https://github.com/openfigis/RFigisGeo
 BugReports: https://github.com/openfigis/RFigisGeo/issues

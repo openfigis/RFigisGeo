@@ -1,23 +1,17 @@
-# exportFeatures.R
-# Authors:
-#  Emmanuel Blondel <emmanuel.blondel@fao.org>
-#  Norbert Billet <norbert.billet@ird.fr>
-#
-# Creation Date: 2013/11/14
-# Revision Date: -
-#=======================
-
-# Export sp object to well-known formats
-#
-# Arguments:
-# - features: the sp object to export
-# - outputFormat: the format of the output file, by default "SHAPE-ZIP" (a zipped shapefile)
-# - file.path: the base path where to export the features
-# - file.name: the name of the output file
-#
-# Notes:
-# - only supported for GML and SHAPE-ZIP
-#
+#' @name exportFeatures
+#' @title exportFeatures
+#' @description Export sp object to well-known formats
+#' 
+#' @param features the sp object to export
+#' @param outputFormat the format of the output file, by default "SHAPE-ZIP" (a zipped shapefile)
+#' @param file.path the base path where to export the features
+#' @param file.name the name of the output file
+#'
+#' @note only supported for GML and SHAPE-ZIP
+#'
+#' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#'         Norbert Billet \email{norbert.billet@@ird.fr}
+#'
 exportFeatures <- function(features, outputFormat = "SHAPE-ZIP", file.path = NULL, file.name = NULL){
   
   uuid <- UUIDgenerate()

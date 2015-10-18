@@ -10,7 +10,8 @@ export(
 	findP4s,
 	readWFS,
 	exportFeatures,
-	getIntersection,
+	intersection,
   toSpatialPoints,
+  joinByArea,
 	reallocate
 )

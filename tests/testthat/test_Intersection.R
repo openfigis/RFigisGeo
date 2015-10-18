@@ -12,7 +12,7 @@ context("Intersection")
 test_that("Intersection",{
 	features1 <- readWFS("http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR")
 	features2 <- readWFS("http://www.fao.org/figis/geoserver/species/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=species:SPECIES_DIST_OCC")
-	intersection <- getIntersection(features1, features2)
+	intersection <- intersection(features1, features2)
 	expect_is(intersection, "SpatialPolygonsDataFrame")
 	expect_true(all(names(features1)[-1] %in% names(intersection)))
 	expect_true(all(names(features2)[-1] %in% names(intersection)))

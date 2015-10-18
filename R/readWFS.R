@@ -1,20 +1,15 @@
-# readWFS.R
-# Authors:
-#	Emmanuel Blondel <emmanuel.blondel@fao.org>
-# 	Norbert Billet <norbert.billet@ird.fr>
-#
-# Creation Date: 2013/11/14
-# Revision Date: -
-#=======================
-
-# Read WFS & returns a sp object
-#
-# Arguments:
-# - url: the baseURL of the WFS GetFeature request
-# - outputFormat: the output format for the WFS GetFeature request, by default "GML"
-# - p4s: an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)
-# - gmlIdAttributeName: specific to GML, the name of the ID attribute, by default "gml_id"
-#
+#' @name readWFS
+#' @title readWFS
+#' @description Read WFS & returns a sp object
+#'
+#' @param url the baseURL of the WFS GetFeature request
+#' @param outputFormat the output format for the WFS GetFeature request, by default "GML"
+#' @param p4s an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)
+#' @param gmlIdAttributeName specific to GML, the name of the ID attribute, by default "gml_id"
+#' @return an object of class "Spatial"
+#' 
+#' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#'         Norbert Billet \email{norbert.billet@@ird.fr} 
 #
 readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
 	

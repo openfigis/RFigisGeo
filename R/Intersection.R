@@ -1,30 +1,22 @@
-# Intersection.R
-# Author: Emmanuel Blondel <emmanuel.blondel@fao.org>
-# Author: Norbert Billet <norbert.billet@ird.fr>
-#
-# Description: computes an intersection
-# Creation Date: 2013/11/14
-# Revision Date: 2013/11/18
-# Revision Date: 2013/12/05 : Improve performance
-# Revision Date: 2014/05/23: Sanitize SpatialCollections & improve performance
-# Revision Date: 2014/06/10: Improve extraction of SpatialCollection
-#===============================================================================
-
-# Computes an Intersection and returns a sp object
-#
-# Arguments:
-# - features1: a first sp object
-# - features2: a second sp object
-# - gmlIdAttributeName: specific to GML, names of the ID attributes for each 
-#                       features, by default c("gml_id", "gml_id")
-# - areaCRS: a CRS object used as reference for area calculation. If no value is
-#            provided, take the current CRS. If NA is provided there no area 
-#            computation.
-#
-# Notes:
-# - only supported for GML2 for now
-#
-getIntersection <- function(features1, features2,
+#' 
+#' @name intersection
+#' @title intersection
+#' @description Computes an Intersection
+#' 
+#' @param features1 a first sp object
+#' @param features2 a second sp object
+#' @param gmlIdAttributeName specific to GML, names of the ID attributes for each 
+#'        features, by default c("gml_id", "gml_id")
+#' @param areaCRS a CRS object used as reference for area calculation. If no value 
+#'        is provided, take the current CRS. If NA is provided there no area computation.
+#' @return an object of class "Spatial"
+#' 
+#' @note only supported for GML 2
+#' 
+#' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
+#'         Norbert Billet \email{norbert.billet@@ird.fr}
+#'
+intersection <- function(features1, features2,
                             gmlIdAttributeName=c("gml_id", "gml_id"), areaCRS){
   
   #check GML id attribute

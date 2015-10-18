@@ -1,23 +1,16 @@
-# findP4s.R
-# Authors:
-#  Norbert Billet <norbert.billet@ird.fr>
-#  Emmanuel Blondel <emmanuel.blondel@fao.org>
-#
-# Creation Date: 2013/11/14
-# Revision Date: -
-#=======================
-
-# Find a proj4 definition from a srsName
-#
-# Arguments:
-# - srsName: name of the spatial reference system
-# - morphToESRI: use the ESRI WKT representation
-# Value:
-#  List of proj4 defnitions where the WKT GEOGCS attribute is equal to the required srsName
-#
-# Comment:
-#  We actually except lat/long coordinates systems due to confusion in output of different WFS vendors
-#
+#' @name findP4s 
+#' @title findP4s
+#' @description Find a proj4 definition from a srsName
+#' 
+#' @param srsName name of the spatial reference system
+#' @param morphToESRI use the ESRI WKT representation
+#' @return a list of proj4 defnitions where the WKT GEOGCS attribute is equal to the required srsName
+#'
+#' @note We actually except lat/long coordinates systems due to confusion in output of different WFS vendors
+#'
+#' @author Norbert Billet \email{norbert.billet@@ird.fr}
+#'         Emmanuel Blondel \email{emmanuel.blonde1@@gmail.com}
+#'         
 findP4s <- function(srsName, morphToESRI=FALSE) {
   
   if (missing(srsName)) {
