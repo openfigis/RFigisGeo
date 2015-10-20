@@ -37,10 +37,16 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- tryCatch(ogrListLayers(destfile),
-                          error = function(error) {if(verbose) message(error)})
-
-		if (is.null(layername)) {
-			if(verbose) message("Unknown or Empty GIS web-resource")
+                          error = function(error) {
+                                    if(verbose){
+                                      message(error)
+                                    }
+                                  })
+		print(is.null(layername))
+    if(is.null(layername)) {
+			if(verbose){
+        message("Unknown or Empty GIS web-resource")
+			}
       return(NULL)
 		}
 		
@@ -101,8 +107,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			
 			if (missing(p4s)) p4s <- srs
 			features = tryCatch(readOGR(destfile, layername, p4s = srs,
-                                  disambiguateFIDs=TRUE, verbose = verbose),
-                          warning = function(msg){ if(verbose) message(msg)},
+                                  disambiguateFIDs = TRUE, verbose = verbose),
                           error = function(err){ if(verbose) message(error)})
       if(!is.null(features)){
         features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
