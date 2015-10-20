@@ -5,7 +5,7 @@
 \title{readWFS}
 \usage{
 readWFS(url, outputFormat = "GML", p4s = NULL,
-  gmlIdAttributeName = "gml_id")
+  gmlIdAttributeName = "gml_id", verbose = TRUE)
 }
 \arguments{
 \item{url}{the baseURL of the WFS GetFeature request}
@@ -15,6 +15,8 @@ readWFS(url, outputFormat = "GML", p4s = NULL,
 \item{p4s}{an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)}
 
 \item{gmlIdAttributeName}{specific to GML, the name of the ID attribute, by default "gml_id"}
+
+\item{verbose}{if log has to printed in the R console. TRUE by default}
 }
 \value{
 an object of class "Spatial"

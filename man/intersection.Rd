@@ -17,8 +17,6 @@ features, by default c("gml_id", "gml_id")}
 
 \item{areaCRS}{a CRS object used as reference for area calculation. If no value
 is provided, take the current CRS. If NA is provided there no area computation.}
-
-\item{only}{supported for GML 2}
 }
 \value{
 an object of class "Spatial"
@@ -28,6 +26,9 @@ Computes an Intersection
 }
 \details{
 
+}
+\note{
+only supported for GML 2
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}

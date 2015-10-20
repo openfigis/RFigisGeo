@@ -15,11 +15,12 @@ exportFeatures(features, outputFormat = "SHAPE-ZIP", file.path = NULL,
 \item{file.path}{the base path where to export the features}
 
 \item{file.name}{the name of the output file}
-
-\item{only}{supported for GML and SHAPE-ZIP}
 }
 \description{
 Export sp object to well-known formats
+}
+\note{
+only supported for GML and SHAPE-ZIP
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}

@@ -6,13 +6,17 @@
 #' @param outputFormat the output format for the WFS GetFeature request, by default "GML"
 #' @param p4s an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)
 #' @param gmlIdAttributeName specific to GML, the name of the ID attribute, by default "gml_id"
+#' @param verbose if log has to printed in the R console. TRUE by default
 #' @return an object of class "Spatial"
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'         Norbert Billet \email{norbert.billet@@ird.fr} 
 #
-readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="gml_id"){
+readWFS <- function(url, outputFormat = "GML", p4s = NULL,
+                    gmlIdAttributeName="gml_id", verbose = TRUE){
 	
+  features <- NULL
+  
 	#request
 	wfsRequest <- url
 	if(outputFormat != "GML") {
@@ -32,9 +36,12 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 		saveXML(xmlfile, destfile)
 		
 		#download.file(wfsRequest, destfile, mode="wb")
-		layername <- ogrListLayers(destfile)
-		if (length(layername) != 1) {
-			stop("Mistake with layers in the input dataset")
+		layername <- tryCatch(ogrListLayers(destfile),
+                          error = function(error) {if(verbose) message(error)})
+
+		if (is.null(layername)) {
+			if(verbose) message("Unknown or Empty GIS web-resource")
+      return(NULL)
 		}
 		
     #check if we have geometry
@@ -92,12 +99,14 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL, gmlIdAttributeName="g
 				warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
 			}
 			
-			if (missing(p4s)){
-				features = readOGR(destfile, layername, p4s = srs, disambiguateFIDs=TRUE)
-			}else{
-				features = readOGR(destfile, layername, p4s = p4s, disambiguateFIDs=TRUE)
-			}
-			features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+			if (missing(p4s)) p4s <- srs
+			features = tryCatch(readOGR(destfile, layername, p4s = srs,
+                                  disambiguateFIDs=TRUE, verbose = verbose),
+                          warning = function(msg){ if(verbose) message(msg)},
+                          error = function(err){ if(verbose) message(error)})
+      if(!is.null(features)){
+        features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+      }
 			
 		}else{
 			membersContent <- sapply(getNodeSet(xmlfile, "//gml:featureMember"), function(x) xmlChildren(x))
