@@ -140,6 +140,8 @@ intersection <- function(features1, features2,
     merge.df$Row.names <- NULL
   }
   
+  merge.df <- cbind(gml_id = row.names(merge.df), merge.df, stringsAsFactors = FALSE)
+  
   #build the result sp dataframe
   return(SpatialPolygonsDataFrame(Sr = int.features, data = merge.df, match.ID=TRUE))
 }
