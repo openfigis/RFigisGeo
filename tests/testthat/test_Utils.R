@@ -35,7 +35,7 @@ test_that("readWFS - geometryless",{
 test_that("exportFeatures",{
 	wfsRequest = "http://www.fao.org/figis/geoserver/fifao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fifao:FAO_MAJOR"
 	features = readWFS(wfsRequest)
-	out1 = exportFeatures(features, outputFormat="SHP")
+	out1 = exportFeatures(features, outputFormat="SHP", tozip = TRUE)
 	expect_true(file.exists(out1))
 	out2 = exportFeatures(features, outputFormat="GML")
 	expect_true(file.exists(out2))
