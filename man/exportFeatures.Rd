@@ -4,13 +4,16 @@
 \alias{exportFeatures}
 \title{exportFeatures}
 \usage{
-exportFeatures(features, outputFormat = "SHAPE-ZIP", file.path = NULL,
-  file.name = NULL)
+exportFeatures(features, outputFormat = "SHP", tozip = FALSE,
+  file.path = NULL, file.name = NULL)
 }
 \arguments{
 \item{features}{the sp object to export}
 
-\item{outputFormat}{the format of the output file, by default "SHAPE-ZIP" (a zipped shapefile)}
+\item{outputFormat}{the format of the output file, by default "SHP"}
+
+\item{tozip}{object of class "logical" indicating if a zip should be created.
+Default is FALSE.}
 
 \item{file.path}{the base path where to export the features}
 
@@ -20,7 +23,7 @@ exportFeatures(features, outputFormat = "SHAPE-ZIP", file.path = NULL,
 Export sp object to well-known formats
 }
 \note{
-only supported for GML and SHAPE-ZIP
+only supported for GML and SHP
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}
