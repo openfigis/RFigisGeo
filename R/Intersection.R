@@ -24,6 +24,21 @@ intersection <- function(features1, features2,
     gmlIdAttributeName <- rep(gmlIdAttributeName, 2)
   }
   
+  hasData1 <- (attr(regexpr("DataFrame", class(features1)),"match.length") > 0)
+  hasData2 <- (attr(regexpr("DataFrame", class(features2)),"match.length") > 0)
+  if(hasData1) {
+	if(!(gmlIdAttributeName[1L] %in% colnames(features1@data))){
+		features1@data$gml_id <- 1:nrow(features1@data)
+		row.names(features1) <- as.character(features1@data$gml_id)
+	}
+  }
+  if(hasData2) {
+	if(!(gmlIdAttributeName[2L] %in% colnames(features2@data))){
+		features2@data$gml_id <- 1:nrow(features2@data)
+		row.names(features2) <- as.character(features2@data$gml_id)
+	}
+  }
+  
   #check CRS
   targetCRS <- proj4string(features1)
   if (targetCRS != proj4string(features2)) {
@@ -41,9 +56,9 @@ intersection <- function(features1, features2,
 
   baseClass1 = class(features1)
   baseClass2 = class(features2)
-  if(attr(regexpr("DataFrame", class(features1)),"match.length") > 0)
+  if(hasData1)
     baseClass1 = strsplit(baseClass1,"DataFrame")[[1]]
-  if(attr(regexpr("DataFrame", class(features2)),"match.length") > 0)
+  if(hasData2)
     baseClass2 = strsplit(baseClass2,"DataFrame")[[1]]
   trgGeomObj <- as.character(refs[baseClass1, baseClass2])
   trgGeomSlot <- switch(trgGeomObj,
@@ -111,37 +126,52 @@ intersection <- function(features1, features2,
   int.features <- spChFIDs(int.features, int.id)
   
   #append attributes
-  merge.df <- merge(
-    merge(features1@data, int.features.structure, by.x=gmlIdAttributeName[1L], by.y="features1"),
-    features2@data,
-    by.x="features2",
-    by.y=gmlIdAttributeName[2L]
-  )
-  rownames(merge.df) <- paste(merge.df[, gmlIdAttributeName[1L]], merge.df$features2, sep="_x_")
-  merge.df$features2 <- NULL
-  merge.df[, gmlIdAttributeName[1L]] <- NULL
-  merge.df$ID <- NULL
+  out <- int.features
+  if(hasData1 || hasData2){
+	
+      merge.df <- int.features.structure 
+	  if(hasData1){
+		merge.df <- merge(features1@data, int.features.structure, by.x=gmlIdAttributeName[1L], by.y="features1")
+	  }
+	  if(hasData2){
+		  merge.df <- merge(
+			merge.df,
+			features2@data,
+			by.x="features2",
+			by.y=gmlIdAttributeName[2L]
+		  )
+	  }
+	  rownames(merge.df) <- paste(merge.df[, gmlIdAttributeName[1L]], merge.df$features2, sep="_x_")
+	  merge.df$features2 <- NULL
+	  merge.df[, gmlIdAttributeName[1L]] <- NULL
+	  merge.df$ID <- NULL
 
-  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
-  #(i.e. areas are not computed if areaCRS=NA)
-  withArea <- FALSE
-  if (missing(areaCRS)) {
-    area.df <- data.frame(geo_area=gArea(int.features, byid=TRUE))
-    withArea <- TRUE
-  } else {
-    if (class(areaCRS) == "CRS") {
-      area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
-      withArea <- TRUE
-    }
-  }
-  if (withArea) {
-    merge.df <- merge(merge.df, area.df, by="row.names")
-    rownames(merge.df) <- merge.df$Row.names
-    merge.df$Row.names <- NULL
-  }
-  
-  merge.df <- cbind(gml_id = row.names(merge.df), merge.df, stringsAsFactors = FALSE)
-  
-  #build the result sp dataframe
-  return(SpatialPolygonsDataFrame(Sr = int.features, data = merge.df, match.ID=TRUE))
+	  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
+	  #(i.e. areas are not computed if areaCRS=NA)
+	  withArea <- FALSE
+	  if (missing(areaCRS)) {
+		area.df <- data.frame(geo_area=gArea(int.features, byid=TRUE))
+		withArea <- TRUE
+	  } else {
+		if (class(areaCRS) == "CRS") {
+		  area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
+		  withArea <- TRUE
+		}
+	  }
+	  if (withArea) {
+		merge.df <- merge(merge.df, area.df, by="row.names")
+		rownames(merge.df) <- merge.df$Row.names
+		merge.df$Row.names <- NULL
+	  }
+	  
+	  merge.df <- cbind(gml_id = row.names(merge.df), merge.df, stringsAsFactors = FALSE)
+	  
+	  #build the result sp dataframe
+	  out <- switch(class(int.features),
+					"SpatialPoints" = SpatialPointsDataFrame(coords = int.features, data = merge.df, match.ID=TRUE),
+					"SpatialLines" = SpatialLinesDataFrame(sl = int.features, data = merge.df, match.ID=TRUE),
+					"SpatialPolygons" = SpatialPolygonsDataFrame(Sr = int.features, data = merge.df, match.ID=TRUE))
+	}
+	
+	return(out)
 }
