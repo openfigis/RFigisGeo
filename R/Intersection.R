@@ -128,6 +128,23 @@ intersection <- function(features1, features2,
   #append attributes
   out <- int.features
   if(hasData1 || hasData2){
+	  
+	  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
+	  #(i.e. areas are not computed if areaCRS=NA)
+	  withArea <- FALSE
+	  if(!missing(areaCRS)){
+		if(class(areaCRS) != "CRS") stop("Invalid areaCRS object. Must be an object of class 'CRS'")
+		if(class(int.features) == "SpatialPolygons") withArea <- TRUE
+	  }
+	  #compute source input areas
+	  if(withArea){
+		features1@data$geo_area1 <- sapply(features1@polygons,function(x){
+			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features1))), areaCRS))
+		})
+		features2@data$geo_area2 <- sapply(features2@polygons,function(x){
+			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features2))), areaCRS))
+		})
+	  }
 	
       merge.df <- int.features.structure 
 	  if(hasData1){
@@ -146,24 +163,22 @@ intersection <- function(features1, features2,
 	  merge.df[, gmlIdAttributeName[1L]] <- NULL
 	  merge.df$ID <- NULL
 
-	  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
-	  #(i.e. areas are not computed if areaCRS=NA)
-	  withArea <- FALSE
-	  if (missing(areaCRS)) {
-		area.df <- data.frame(geo_area=gArea(int.features, byid=TRUE))
-		withArea <- TRUE
-	  } else {
-		if (class(areaCRS) == "CRS") {
-		  area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
-		  withArea <- TRUE
-		}
-	  }
 	  if (withArea) {
+		#intersection area
+		area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
 		merge.df <- merge(merge.df, area.df, by="row.names")
-		rownames(merge.df) <- merge.df$Row.names
-		merge.df$Row.names <- NULL
+		
+		#add percentages of area
+		merge.df$per_area1 <- merge.df$geo_area / merge.df$geo_area1 * 100
+		merge.df$per_area2 <- merge.df$geo_area / merge.df$geo_area2 * 100
+		
+	  }else{
+		area.df <- data.frame(geo_area=gArea(int.features, byid=TRUE))
+		merge.df <- merge(merge.df, area.df, by="row.names")
 	  }
 	  
+	  rownames(merge.df) <- merge.df$Row.names
+	  merge.df$Row.names <- NULL	  
 	  merge.df <- cbind(gml_id = row.names(merge.df), merge.df, stringsAsFactors = FALSE)
 	  
 	  #build the result sp dataframe
