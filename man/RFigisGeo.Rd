@@ -10,10 +10,10 @@ RFigisGeo provides a set of utility tools to do geospatial data processing
 }
 \details{
 \tabular{ll}{
-   Package: \tab cleangeo\cr
+   Package: \tab RFigisGeo\cr
    Type: \tab Package\cr
    Version: \tab 0.3\cr
-   Date: \tab 2015-10-18\cr
+   Date: \tab 2016-06-29\cr
    License: \tab GPL(>=2.0)\cr
    LazyLoad: \tab yes\cr
  }
