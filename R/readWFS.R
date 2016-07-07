@@ -112,7 +112,8 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                                   disambiguateFIDs = TRUE, verbose = verbose),
                           error = function(err){ if(verbose) message(error)})
       if(!is.null(features)){
-        features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+        if(regexpr("SpatialPoints", class(features)) == -1)
+          features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
       }
 			
 		}else{
