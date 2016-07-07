@@ -69,7 +69,10 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			# get the Spatial Reference System (SRS)
 			srs <- NA
 			#xmlfile<-xmlTreeParse(destfile, useInternalNodes = TRUE)
-			srsName <- getNodeSet(xmlfile, "(//gml:featureMember//@srsName)[1]")
+			fmXML <- getNodeSet(xmlfile, "//gml:featureMember")
+			if(length(fmXML) > 0)
+			  fmXML <- fmXML[[1]]
+			  srsName <- getNodeSet(xmlDoc(fmXML), "//@srsName")
 			if (length(srsName) == 1) {
 				srsName <- as.character(srsName[[1]])
 				
