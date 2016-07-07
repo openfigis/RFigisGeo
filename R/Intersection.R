@@ -27,16 +27,16 @@ intersection <- function(features1, features2,
   hasData1 <- (attr(regexpr("DataFrame", class(features1)),"match.length") > 0)
   hasData2 <- (attr(regexpr("DataFrame", class(features2)),"match.length") > 0)
   if(hasData1) {
-	if(!(gmlIdAttributeName[1L] %in% colnames(features1@data))){
-		features1@data$gml_id <- 1:nrow(features1@data)
-		row.names(features1) <- as.character(features1@data$gml_id)
-	}
+  	if(!(gmlIdAttributeName[1L] %in% colnames(features1@data))){
+  		features1@data$gml_id <- 1:nrow(features1@data)
+  	}
+  	row.names(features1) <- as.character(features1@data$gml_id)
   }
   if(hasData2) {
-	if(!(gmlIdAttributeName[2L] %in% colnames(features2@data))){
-		features2@data$gml_id <- 1:nrow(features2@data)
-		row.names(features2) <- as.character(features2@data$gml_id)
-	}
+  	if(!(gmlIdAttributeName[2L] %in% colnames(features2@data))){
+  		features2@data$gml_id <- 1:nrow(features2@data)
+  	}
+  	row.names(features2) <- as.character(features2@data$gml_id)
   }
   
   #check CRS
@@ -62,6 +62,7 @@ intersection <- function(features1, features2,
     baseClass2 = strsplit(baseClass2,"DataFrame")[[1]]
   trgGeomObj <- as.character(refs[baseClass1, baseClass2])
   trgGeomSlot <- switch(trgGeomObj,
+    "point"= c(NA, "Points"),
     "line" = c("lines","Lines"),
     "poly" = c("polygons", "Polygons")
   )
@@ -123,7 +124,7 @@ intersection <- function(features1, features2,
   int.features.structure <- data.frame(ID = int.id,
                                        features1 = nrn[,1], features2 = nrn[,2],
                                        stringsAsFactors=FALSE)
-  int.features <- spChFIDs(int.features, int.id)
+  if(regexpr("SpatialPoints", class(int.features)) == -1) int.features <- spChFIDs(int.features, int.id)
   
   #append attributes
   out <- int.features
@@ -133,30 +134,25 @@ intersection <- function(features1, features2,
 	  #(i.e. areas are not computed if areaCRS=NA)
 	  withArea <- FALSE
 	  if(!missing(areaCRS)){
-		if(class(areaCRS) != "CRS") stop("Invalid areaCRS object. Must be an object of class 'CRS'")
-		if(class(int.features) == "SpatialPolygons") withArea <- TRUE
+  		if(class(areaCRS) != "CRS") stop("Invalid areaCRS object. Must be an object of class 'CRS'")
+  		if(class(int.features) == "SpatialPolygons") withArea <- TRUE
 	  }
 	  #compute source input areas
 	  if(withArea){
-		features1@data$geo_area1 <- sapply(features1@polygons,function(x){
-			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features1))), areaCRS))
-		})
-		features2@data$geo_area2 <- sapply(features2@polygons,function(x){
-			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features2))), areaCRS))
-		})
+  		features1@data$geo_area1 <- sapply(features1@polygons,function(x){
+  			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features1))), areaCRS))
+  		})
+  		features2@data$geo_area2 <- sapply(features2@polygons,function(x){
+  			gArea(spTransform(SpatialPolygons(Srl =list(x), proj4string = CRS(proj4string(features2))), areaCRS))
+  		})
 	  }
 	
-      merge.df <- int.features.structure 
+    merge.df <- int.features.structure 
 	  if(hasData1){
-		merge.df <- merge(features1@data, int.features.structure, by.x=gmlIdAttributeName[1L], by.y="features1")
+		  merge.df <- merge(features1@data, int.features.structure, by.x=gmlIdAttributeName[1L], by.y="features1")
 	  }
 	  if(hasData2){
-		  merge.df <- merge(
-			merge.df,
-			features2@data,
-			by.x="features2",
-			by.y=gmlIdAttributeName[2L]
-		  )
+		  merge.df <- merge(merge.df, features2@data, by.x="features2", by.y=gmlIdAttributeName[2L])
 	  }
 	  rownames(merge.df) <- paste(merge.df[, gmlIdAttributeName[1L]], merge.df$features2, sep="_x_")
 	  merge.df$features2 <- NULL
@@ -164,22 +160,19 @@ intersection <- function(features1, features2,
 	  merge.df$ID <- NULL
 
 	  if (withArea) {
-		#intersection area
-		area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
-		merge.df <- merge(merge.df, area.df, by="row.names")
-		
-		#add percentages of area
-		merge.df$per_area1 <- merge.df$geo_area / merge.df$geo_area1 * 100
-		merge.df$per_area2 <- merge.df$geo_area / merge.df$geo_area2 * 100
-		
-	  }else{
-		area.df <- data.frame(geo_area=gArea(int.features, byid=TRUE))
-		merge.df <- merge(merge.df, area.df, by="row.names")
-	  }
+  		#intersection area
+  		area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
+  		merge.df <- merge(merge.df, area.df, by="row.names")
+  		
+  		#add percentages of area
+  		merge.df$per_area1 <- merge.df$geo_area / merge.df$geo_area1 * 100
+  		merge.df$per_area2 <- merge.df$geo_area / merge.df$geo_area2 * 100
+  		
+    }
 	  
-	  rownames(merge.df) <- merge.df$Row.names
 	  merge.df$Row.names <- NULL	  
-	  merge.df <- cbind(gml_id = row.names(merge.df), merge.df, stringsAsFactors = FALSE)
+	  merge.df <- cbind(gml_id = row.names(int.features), merge.df, stringsAsFactors = FALSE)
+	  rownames(merge.df) <- row.names(int.features)
 	  
 	  #build the result sp dataframe
 	  out <- switch(class(int.features),
