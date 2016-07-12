@@ -74,7 +74,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			if(length(fmXML) > 0)
 			  fmXML <- fmXML[[1]]
 			  srsName <- getNodeSet(xmlDoc(fmXML), "//@srsName")
-			if (length(srsName) == 1) {
+			if (length(srsName) >= 1) {
 				srsName <- as.character(srsName[[1]])
 			}	
 			#srsName patterns matching		
