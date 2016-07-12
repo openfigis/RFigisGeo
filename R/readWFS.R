@@ -76,33 +76,32 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			  srsName <- getNodeSet(xmlDoc(fmXML), "//@srsName")
 			if (length(srsName) == 1) {
 				srsName <- as.character(srsName[[1]])
-				
-				#srsName patterns matching		
-				srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
+			}	
+			#srsName patterns matching		
+			srsPattern = "http://www.opengis.net/gml/srs/epsg.xml#" #match case 1
+			if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
+				epsg <- unlist(strsplit(srsName, srsPattern))[2]
+				srs <- paste("+init=epsg:", epsg, sep="")
+			}else{
+				srsPattern = "urn:(x-)?ogc:def:crs:EPSG" #match case 2
 				if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
-					epsg <- unlist(strsplit(srsName, srsPattern))[2]
+					srsStr <- unlist(strsplit(srsName, ":"))
+					epsg <- srsStr[length(srsStr)]
 					srs <- paste("+init=epsg:", epsg, sep="")
 				}else{
-					srsPattern = "urn:(x-)?ogc:def:crs:EPSG" #match case 2
-					if(attr(regexpr(srsPattern, srsName, ignore.case = T),"match.length") > 0){
-						srsStr <- unlist(strsplit(srsName, ":"))
-						epsg <- srsStr[length(srsStr)]
-						srs <- paste("+init=epsg:", epsg, sep="")
-					}else{
-						#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
-						#if yes set srs with the corresponding proj4string
-						#first search without any consideration of the ESRI representation
-						srs <- findP4s(srsName, morphToESRI=FALSE)
-						if (is.na(srs)) {
-							#if not found search with consideration of the ESRI representation
-							srs <- findP4s(srsName, morphToESRI=TRUE)
-						}
-						if (! is.na(srs) && ! length(srs) == 1) {
-							srs <- NA
-						}
+					#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
+					#if yes set srs with the corresponding proj4string
+					#first search without any consideration of the ESRI representation
+					srs <- findP4s(srsName, morphToESRI=FALSE)
+					if (is.na(srs)) {
+						#if not found search with consideration of the ESRI representation
+						srs <- findP4s(srsName, morphToESRI=TRUE)
+					}
+					if (! is.na(srs) && ! length(srs) == 1) {
+						srs <- NA
 					}
 				}
-			}	
+			}
 			
 			if(is.na(srs)){
 				warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
