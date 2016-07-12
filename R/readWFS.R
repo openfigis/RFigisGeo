@@ -15,7 +15,7 @@
 readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                     gmlIdAttributeName="gml_id", verbose = TRUE){
 	
-  features <- NULL
+  	features <- NULL
   
 	#request
 	wfsRequest <- url
@@ -36,35 +36,36 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		saveXML(xmlfile, destfile)
 		
 		#download.file(wfsRequest, destfile, mode="wb")
-		layername <- tryCatch(ogrListLayers(destfile),
-                          error = function(error) {
-                                    if(verbose){
-                                      message(error)
-                                    }
-                                  })
-    if(is.null(layername)) {
+		layername <- tryCatch(
+			ogrListLayers(destfile),
+			error = function(error) {
+				if(verbose){
+					message(error)
+				}
+			})
+    		if(is.null(layername)) {
 			if(verbose){
-        logger.warn("Unknown or Empty GIS web-resource")
+        			logger.warn("Unknown or Empty GIS web-resource")
 			}
-      return(NULL)
+      			return(NULL)
 		}
 		
-    #check if we have geometry
-    propertyNames <- NULL
-    properties <- unlist(strsplit(wfsRequest,"&propertyName="))
-    if(length(properties) > 1){
-      propertyNames <- unlist(strsplit(properties[length(properties)], "&"))[1]
-      propertyNames <- unlist(strsplit(propertyNames, ","))
-    }
+    		#check if we have geometry
+    		propertyNames <- NULL
+    		properties <- unlist(strsplit(wfsRequest,"&propertyName="))
+		if(length(properties) > 1){
+		      propertyNames <- unlist(strsplit(properties[length(properties)], "&"))[1]
+		      propertyNames <- unlist(strsplit(propertyNames, ","))
+	    	}
 		if(!is.null(propertyNames)){
-      hasGeometry <- any(c("GEOMETRY", "geometry", "THE_GEOM","the_geom") %in% propertyNames)
+      			hasGeometry <- any(c("GEOMETRY", "geometry", "THE_GEOM","the_geom") %in% propertyNames)
 		}else{
 		  hasGeometry = ((length(getNodeSet(xmlfile, "//gml:featureMember//gml:coordinates")) > 0)
 		                 || (length(getNodeSet(xmlfile, "//gml:featureMember//gml:pos")) > 0)
 		                 || (length(getNodeSet(xmlfile, "//gml:featureMember//gml:posList")) > 0))
 		}
     
-    if(hasGeometry){
+		 if(hasGeometry){
 			
 			# get the Spatial Reference System (SRS)
 			srs <- NA
@@ -108,23 +109,22 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			}
 			
 			if (missing(p4s)) p4s <- srs
-			features = tryCatch(readOGR(destfile, layername, p4s = srs,
-                                  disambiguateFIDs = TRUE, verbose = verbose),
-                          error = function(err){ if(verbose) message(err)})
-      if(!is.null(features)){
-        if(regexpr("SpatialPoints", class(features)) == -1)
-          features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
-      }
+			features = tryCatch(
+				readOGR(destfile, layername, p4s = srs, disambiguateFIDs = TRUE, verbose = verbose),
+                        	error = function(err){ if(verbose) message(paste0(err,"\n"))})
+			if(!is.null(features)){
+				if(regexpr("SpatialPoints", class(features)) == -1)
+					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+			}
 			
 		}else{
 			membersContent <- sapply(getNodeSet(xmlfile, "//gml:featureMember"), function(x) xmlChildren(x))
 			fid <- sapply(membersContent, function(x) xmlAttrs(x))
 			membersAttributes <- xmlToDataFrame(
-        nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"),
-        stringsAsFactors = FALSE
-      )
+        			nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"),
+        			stringsAsFactors = FALSE
+      			)
 			features <- cbind(fid, membersAttributes, stringsAsFactors = FALSE)
-      
 		}
 		     	
 	}else{
