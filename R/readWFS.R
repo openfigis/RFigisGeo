@@ -110,7 +110,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			if (missing(p4s)) p4s <- srs
 			features = tryCatch(readOGR(destfile, layername, p4s = srs,
                                   disambiguateFIDs = TRUE, verbose = verbose),
-                          error = function(err){ if(verbose) message(error)})
+                          error = function(err){ if(verbose) message(err)})
       if(!is.null(features)){
         if(regexpr("SpatialPoints", class(features)) == -1)
           features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
