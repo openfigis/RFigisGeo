@@ -11,7 +11,7 @@
 #'    Package: \tab RFigisGeo\cr
 #'    Type: \tab Package\cr
 #'    Version: \tab 0.3\cr
-#'    Date: \tab 2016-07-07\cr
+#'    Date: \tab 2016-07-22\cr
 #'    License: \tab GPL(>=2.0)\cr
 #'    LazyLoad: \tab yes\cr
 #'  }

@@ -6,6 +6,7 @@
 #' @param outputFormat the output format for the WFS GetFeature request, by default "GML"
 #' @param p4s an optional proj4string, by default NULL (an attempt will be performed to get the projection from the data)
 #' @param gmlIdAttributeName specific to GML, the name of the ID attribute, by default "gml_id"
+#' @param target.dir a target directory where temporary GML files will be downloaded
 #' @param verbose if log has to printed in the R console. TRUE by default
 #' @return an object of class "Spatial"
 #' 
@@ -13,7 +14,8 @@
 #'         Norbert Billet \email{norbert.billet@@ird.fr} 
 #
 readWFS <- function(url, outputFormat = "GML", p4s = NULL,
-                    gmlIdAttributeName="gml_id", verbose = TRUE){
+                    gmlIdAttributeName="gml_id", target.dir = NULL,
+                    verbose = TRUE){
 	
   	features <- NULL
   
@@ -31,7 +33,17 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
 		
 		#write the file to disk
-		tempf = tempfile() 
+    tempdir <- NULL
+    if(missing(target.dir) || is.null(target.dir)){
+      tempdir <- tempdir()
+    }else{
+      if(file.exists(target.dir)){ 
+        tempdir <- target.dir
+      }else{
+        stop(sprintf("Target directory %s doesn't exist",target.dir))
+      }
+    }
+		tempf = tempfile(tmpdir = tempdir) 
 		destfile = paste(tempf,".gml",sep='')
 		saveXML(xmlfile, destfile)
 		
@@ -130,5 +142,10 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 	}else{
 		stop("Unsupported WFS format")
 	}
+  
+  #unlink temporary files
+	unlink(list.files(pattern = "\\.gml$"), recursive=TRUE)
+	unlink(list.files(pattern = "\\.gfs$"), recursive=TRUE)
+  
 	return(features)
 }
