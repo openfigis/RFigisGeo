@@ -42,7 +42,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                                       message(error)
                                     }
                                   })
-    if(is.null(layername)) {
+    if(is.null(layername) || length(layername) == 0) {
 			if(verbose){
         logger.warn("Unknown or Empty GIS web-resource")
 			}
