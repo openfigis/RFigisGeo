@@ -22,7 +22,7 @@ test_that("readWFS",{
 	features = readWFS(wfsRequest)
 	expect_equal(typeof(features), "S4")
 	expect_is(features, "SpatialPolygonsDataFrame")
-	expect_equal(length(features), 19L)
+	expect_equal(length(features), 24L)
 })
 
 test_that("readWFS - geometryless",{
