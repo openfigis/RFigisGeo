@@ -60,6 +60,13 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
       if(verbose) logger.error(sprintf("GML file %s cannot be found \n", destfile))
       return(NULL)
     }
+    
+    deleteGML <- function(){
+      if(verbose) logger.info(sprintf("Deleting temporary GML file '%s' \n",destfile))
+      unlink(destfile)
+      unlink(paste0(tempf,".gfs"))
+    }
+    
 		
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- tryCatch(
@@ -67,6 +74,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		  error = function(error) {
 		    if(verbose){
 		      logger.error(error)
+		      deleteGML()
 		    }
 		  })
   
@@ -140,7 +148,12 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			if(verbose) logger.info(sprintf("Reading temporary GML file '%s' with GDAL \n",destfile))
 			features = tryCatch(
 				readOGR(destfile, layername, p4s = srs, disambiguateFIDs = TRUE, verbose = verbose),
-                        	error = function(err){ if(verbose) logger.error(err)})
+                        	error = function(err){
+                            if(verbose){
+                              logger.error(err)
+                              deleteGML()
+                            }
+                          })
 			if(!is.null(features)){
 				if(regexpr("SpatialPoints", class(features)) == -1)
 					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
@@ -161,9 +174,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 	}
   
   #unlink temporary files
-  if(verbose) logger.info(sprintf("Deleting temporary GML file '%s' \n",destfile))
-	unlink(destfile, recursive=TRUE)
-	unlink(paste0(tempf,".gfs"), recursive=TRUE)
+  deleteGML()
   
   if(verbose){
     logger.info("WFS features successfully fetched! \n")
