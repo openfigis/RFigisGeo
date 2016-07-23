@@ -1,26 +1,35 @@
-language: c
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+language: R
+sudo: required
+cache: packages
+  
+apt_packages:
+  - libcurl4-openssl-dev
+  - libxml2-dev
+  - libgdal1-dev
+  - libproj-dev
+  - libgeos-dev
 
-before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - sudo apt-get update -qq
-  - sudo apt-get -y install libproj-dev libgdal1-dev
-  - ./travis-tool.sh bootstrap
-  - ./travis-tool.sh install_r devtools
-  - ./travis-tool.sh install_r testthat
-  - ./travis-tool.sh install_r RCurl
-  - ./travis-tool.sh install_r XML
-  - ./travis-tool.sh install_r sp
-  - ./travis-tool.sh install_r rgdal
-  - ./travis-tool.sh install_r rgeos
-  - ./travis-tool.sh install_r uuid
-  - sudo apt-get install libgeos-dev
+r:
+  - oldrel
+  - release
+  - devel
   
-script:
-  - ./travis-tool.sh run_tests
+r_binary_packages:
+  - RCurl
+  - XML
+  - rgdal
+  - rgeos
   
-after_failure:
-  - ./travis-tool.sh dump_logs
+r_packages:
+  - testthat
+  - sp
+  - uuid
+
+r_check_args: --as-cran
+
+after_script:
+ - ./travis-tool.sh dump_logs
 
 notifications:
   email:
