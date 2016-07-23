@@ -16,8 +16,8 @@
 readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                     gmlIdAttributeName="gml_id", target.dir = NULL,
                     verbose = TRUE){
-	
-  	features <- NULL
+  
+  features <- NULL
   
 	#request
 	wfsRequest <- url
@@ -25,6 +25,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		wfsRequest <- paste(url, "&outputFormat=", outputFormat, sep="")
 	}
 	
+  if(verbose) logger.info(sprintf("Reading WFS request: %s \n",wfsRequest))
 	if(outputFormat == "GML") {
 		# download the data
 		percentCodes <- "%20"
@@ -32,6 +33,11 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		content <- getURL(curlPercentEncode(x = wfsRequest, codes = percentCodes))
 		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
 		
+    if(!all(class(xmlfile) == c("XMLInternalDocument","XMLAbstractDocument"))){
+      if(verbose) logger.error("Fetch data doesn't seem in XML format \n")
+      return(NULL)
+    }
+    
 		#write the file to disk
     tempdir <- NULL
     if(missing(target.dir) || is.null(target.dir)){
@@ -40,27 +46,33 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
       if(file.exists(target.dir)){ 
         tempdir <- target.dir
       }else{
-        stop(sprintf("Target directory %s doesn't exist",target.dir))
+        if(verbose) logger.error(sprintf("Target directory %s doesn't exist \n",target.dir))
+        return(NULL)
       }
     }
+    
+    if(verbose) logger.info(sprintf("Writing temporary GML file to '%s' \n",tempdir))
 		tempf = tempfile(tmpdir = tempdir) 
 		destfile = paste(tempf,".gml",sep='')
 		saveXML(xmlfile, destfile)
+    
+    if(!file.exists(destfile)){
+      if(verbose) logger.error(sprintf("GML file %s cannot be found \n", destfile))
+      return(NULL)
+    }
 		
 		#download.file(wfsRequest, destfile, mode="wb")
 		layername <- tryCatch(
 		  ogrListLayers(destfile),
 		  error = function(error) {
 		    if(verbose){
-		      message(error)
+		      logger.error(error)
 		    }
 		  })
   
     if(is.null(layername) || length(layername) == 0) {
-			 if(verbose){
-        logger.warn("Unknown or Empty GIS web-resource")
-			 }
-      return(NULL)
+     if(verbose) logger.error("Unknown or Empty GIS web-resource \n")
+     return(NULL)
 		}
 		
     #check if we have geometry
@@ -81,6 +93,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		 if(hasGeometry){
 			
 			# get the Spatial Reference System (SRS)
+      if(verbose) logger.info("Inheriting Spatial Reference System...\n")
 			srs <- NA
 			#xmlfile<-xmlTreeParse(destfile, useInternalNodes = TRUE)
 			fmXML <- getNodeSet(xmlfile, "//gml:featureMember")
@@ -105,8 +118,9 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 					#search if srsName is a WKT PROJ name (PROJCS or GEOGCS)
 					#if yes set srs with the corresponding proj4string
 					#first search without any consideration of the ESRI representation
+          if(verbose) logger.info("Fetching SRS definition\n")
 					srs <- findP4s(srsName, morphToESRI=FALSE)
-					if (is.na(srs)) {
+					if (is.na(srs)){
 						#if not found search with consideration of the ESRI representation
 						srs <- findP4s(srsName, morphToESRI=TRUE)
 					}
@@ -117,13 +131,16 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			}
 			
 			if(is.na(srs)){
-				warning("Unable to convert GML srsName to a CRS object. CRS will be set to NA", call. = T)
+				if(verbose) logger.warn("Unable to convert GML srsName to a CRS object. CRS will be set to NA \n")
+			}else{
+        if(verbose) logger.info(sprintf("SRS definition = '%s' \n",srs))
 			}
 			
 			if (missing(p4s)) p4s <- srs
+			if(verbose) logger.info(sprintf("Reading temporary GML file '%s' with GDAL \n",destfile))
 			features = tryCatch(
 				readOGR(destfile, layername, p4s = srs, disambiguateFIDs = TRUE, verbose = verbose),
-                        	error = function(err){ if(verbose) message(paste0(err,"\n"))})
+                        	error = function(err){ if(verbose) logger.error(err)})
 			if(!is.null(features)){
 				if(regexpr("SpatialPoints", class(features)) == -1)
 					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
@@ -144,8 +161,13 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 	}
   
   #unlink temporary files
-	unlink(list.files(pattern = "\\.gml$"), recursive=TRUE)
-	unlink(list.files(pattern = "\\.gfs$"), recursive=TRUE)
+  if(verbose) logger.info(sprintf("Deleting temporary GML file '%s' \n",destfile))
+	unlink(destfile, recursive=TRUE)
+	unlink(paste0(tempf,".gfs"), recursive=TRUE)
   
+  if(verbose){
+    logger.info("WFS features successfully fetched! \n")
+    logger.info(sprintf("Number of features = %s \n", nrow(features)))
+  }
 	return(features)
 }
