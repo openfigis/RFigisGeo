@@ -158,8 +158,10 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                             		}
                         })
 			if(!is.null(features)){
-				if(regexpr("SpatialPoints", class(features)) == -1)
-					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])) 
+				if(regexpr("SpatialPoints", class(features)) == -1){
+					logger.info(sprint("Add feature identifiers for object of class '%s'", class(features)))
+					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName]))
+				}
 			}else{
 				if(verbose) logger.warn(sprintf("Features returned by GDAL are null \n",destfile))	
 			}
