@@ -133,7 +133,7 @@ intersection <- function(features1, features2,
 	  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
 	  #(i.e. areas are not computed if areaCRS=NA)
 	  withArea <- FALSE
-	  if(!missing(areaCRS) && !is.null(areaCRS){
+	  if(!missing(areaCRS) && !is.null(areaCRS)){
   		if(class(areaCRS) != "CRS") stop("Invalid areaCRS object. Must be an object of class 'CRS'")
   		if(class(int.features) == "SpatialPolygons") withArea <- TRUE
 	  }
