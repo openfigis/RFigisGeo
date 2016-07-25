@@ -160,7 +160,15 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			if(!is.null(features)){
 				if(regexpr("SpatialPoints", class(features)) == -1){
 					logger.info(sprintf("Add feature identifiers for object of class '%s' \n", class(features)))
-					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName]))
+					features <- tryCatch(
+						spChFIDs(features, as.character(features@data[,gmlIdAttributeName])),
+						error = function(err){
+							if(verbose){
+								logger.error("Error in adding feature identifiers \n")
+								logger.error(sprintf("Cause: %s", err))
+								logger.error(sprintf("Cause object: %s \n",features))
+							}
+						})
 				}
 			}else{
 				if(verbose) logger.warn(sprintf("Features returned by GDAL are null \n",destfile))	
@@ -184,8 +192,12 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 	}
 
   	if(verbose){
-    		logger.info("WFS features successfully fetched! \n")
-    		logger.info(sprintf("Number of features = %s \n", nrow(features)))
+  		if(!is.null(features)){
+    			logger.info("WFS features successfully fetched! \n")
+    			logger.info(sprintf("Number of features = %s \n", nrow(features)))
+    		}else{
+    			logger.warn("Empty WFS feature collection \n")
+    		}
   	}
 	return(features)
 }
