@@ -160,8 +160,13 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			if(!is.null(features)){
 				if(regexpr("SpatialPoints", class(features)) == -1){
 					logger.info(sprintf("Add feature identifiers for object of class '%s' \n", class(features)))
-					features <- tryCatch(
-						spChFIDs(features, as.character(features@data[,gmlIdAttributeName])),
+					
+					if(!(gmlIdAttributeName %in% colnames(slot(features, "data")))){
+					    slot(features, "data") <- cbind(gml_id = paste(layername,1:nrow(slot(features,"data")),sep="."), slot(features,"data"))
+					}
+					
+					tryCatch(
+						features <<- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])),
 						error = function(err){
 							if(verbose){
 								logger.error("Error in adding feature identifiers \n")
