@@ -80,15 +80,18 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		      			deleteGML()
 				}
 		})
+		
   
-    		if(is.null(layername) || length(layername) == 0) {
+    	if(is.null(layername) || length(layername) == 0) {
 			if(verbose) logger.error("Unknown or Empty GIS web-resource \n")
 			return(NULL)
+		}else{
+		    if(verbose) logger.info(sprintf("Layer identified by GDAL as '%s'", layername))
 		}
 		
-    		#check if we have geometry
-    		propertyNames <- NULL
-    		properties <- unlist(strsplit(wfsRequest,"&propertyName="))
+        #check if we have geometry
+    	propertyNames <- NULL
+    	properties <- unlist(strsplit(wfsRequest,"&propertyName="))
 		if(length(properties) > 1){
 		      propertyNames <- unlist(strsplit(properties[length(properties)], "&"))[1]
 		      propertyNames <- unlist(strsplit(propertyNames, ","))
