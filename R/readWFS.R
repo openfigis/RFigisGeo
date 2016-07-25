@@ -159,7 +159,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                         })
 			if(!is.null(features)){
 				if(regexpr("SpatialPoints", class(features)) == -1){
-					logger.info(sprintf("Add feature identifiers for object of class '%s'", class(features)))
+					logger.info(sprintf("Add feature identifiers for object of class '%s' \n", class(features)))
 					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName]))
 				}
 			}else{
