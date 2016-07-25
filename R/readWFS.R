@@ -51,7 +51,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
       			}
     		}
     
-    		if((verbose){
+    		if(verbose){
     			logger.info(sprintf("Writing temporary GML file to '%s' \n",tempdir))
     		}
 		
