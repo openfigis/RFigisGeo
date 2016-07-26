@@ -175,11 +175,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			
 		}else{
 			featureMembers <- getNodeSet(xmlfile, "//gml:featureMember")
-			if(length(featureMembers)==0){
-				if(verbose) logger.warn("Empty feature collection\n")
-				deleteGML()
-				return(NULL)
-			}else{
+			if(length(featureMembers)>0){
 				membersContent <- sapply(featureMembers, function(x) xmlChildren(x))
 				fid <- sapply(membersContent, function(x) xmlAttrs(x))
 				membersAttributes <- xmlToDataFrame(
