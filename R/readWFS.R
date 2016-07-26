@@ -174,13 +174,20 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 			}
 			
 		}else{
-			membersContent <- sapply(getNodeSet(xmlfile, "//gml:featureMember"), function(x) xmlChildren(x))
-			fid <- sapply(membersContent, function(x) xmlAttrs(x))
-			membersAttributes <- xmlToDataFrame(
-        			nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"),
-        			stringsAsFactors = FALSE
-      			)
-			features <- cbind(fid, membersAttributes, stringsAsFactors = FALSE)
+			featureMembers <- getNodeSet(xmlfile, "//gml:featureMember")
+			if(length(featureMembers)==0){
+				if(verbose) logger.warn("Empty feature collection\n")
+				deleteGML()
+				return(NULL)
+			}else{
+				membersContent <- sapply(featureMembers, function(x) xmlChildren(x))
+				fid <- sapply(membersContent, function(x) xmlAttrs(x))
+				membersAttributes <- xmlToDataFrame(
+	        			nodes = getNodeSet(xmlfile, "//gml:featureMember/*[@*]"),
+	        			stringsAsFactors = FALSE
+	      			)
+				features <- cbind(fid, membersAttributes, stringsAsFactors = FALSE)
+			}
 		}
 		  
   		#unlink temporary files
