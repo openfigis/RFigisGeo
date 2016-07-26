@@ -167,16 +167,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 					if(!(gmlIdAttributeName %in% colnames(slot(features, "data")))){
 					    slot(features, "data") <- cbind(gml_id = paste(layername,1:nrow(slot(features,"data")),sep="."), slot(features,"data"))
 					}
-					
-					tryCatch(
-						features <<- spChFIDs(features, as.character(features@data[,gmlIdAttributeName])),
-						error = function(err){
-							if(verbose){
-								logger.error("Error in adding feature identifiers \n")
-								logger.error(sprintf("Cause: %s", err))
-								logger.error(sprintf("Cause object: %s \n",features))
-							}
-						})
+					features <- spChFIDs(features, as.character(features@data[,gmlIdAttributeName]))
 				}
 			}else{
 				if(verbose) logger.warn(sprintf("Features returned by GDAL are null \n",destfile))	
