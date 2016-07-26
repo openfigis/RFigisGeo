@@ -69,10 +69,18 @@ intersection <- function(features1, features2,
   trgGeomClass <- paste("Spatial", trgGeomSlot[2], sep = "")
   
   #compute intersection predicates
-  features.intersects <- gIntersects(features1, features2, byid=TRUE)
+  features.intersects <- NULL
+  tryCatch({
+  	features.intersects <- gIntersects(features1, features2, byid=TRUE)
+  },error=function(error){
+  	logger.error(paste(error,"\n"))
+  })
+  if(is.null(features.intersects)){
+  	logger.warn("No intersect between the 2 source feature collections")
+  	return(NULL)
+  }
   features1 <- features1[apply(features.intersects, 2L, function(x) {sum(x)}) > 0, ]
   features2 <- features2[apply(features.intersects, 1L, function(x) {sum(x)}) > 0, ]
-  
   int <- gIntersects(features1, features2, byid=TRUE)
   int.df <- data.frame(int)
   colnames(int.df) <- row.names(features1)
