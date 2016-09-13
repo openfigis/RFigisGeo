@@ -18,30 +18,39 @@
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #' 
-reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea, wprob = NULL, aggregates = NULL){
+reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea = NULL, wprob = NULL, aggregates = NULL){
+	
+	if(is.null(warea) && is.null(wprob)){
+		stop("Value is required for 'warea' (areal reallocation) or 'wprob' (probabilistic reallocation) or both (if combined)")
+	}
+	
+		
+	#area weight
+	if(is.null(warea)){
+		y[,warea] <- rep(1L, nrow(y))
+	}else{
+		if(!is.numeric(y[,warea])){
+			y[,warea] <- switch(class(y[,warea]),
+				"character" = as.numeric(y[,warea]),
+				"factor" = as.numeric(as.character(y[,warea]))
+			)
+		}
+	}
 	
 	#probability weight
 	if(is.null(wprob)){
-		prob <- rep(1L, nrow(y))
+		y[,wprob] <- rep(1L, nrow(y))
 	}else{
 		if(!is.numeric(y[,wprob])){
-			prob <- switch(class(y[,wprob]),
+			y[,wprob] <- switch(class(y[,wprob]),
 				"character" = as.numeric(y[,wprob]),
 				"factor" = as.numeric(as.character(y[,wprob]))
 			)
-		}else{
-			prob <- y[,wprob]
 		}
 	}
 	
 	#pre-calculations
-	if(!is.numeric(y[,warea])){
-		y[,warea] <- switch(class(y[,warea]),
-			"character" = as.numeric(y[,warea]),
-			"factor" = as.numeric(as.character(y[,warea]))
-		)
-	}
-	precalc <- cbind(y, w = prob * y[,warea])	
+	precalc <- cbind(y, w = y[,wprob] * y[,warea])	
 	names.x <- area.x
 	names.y <- area.y
 	if(!is.null(by.x)) names.x <- c(names.x, by.x)
