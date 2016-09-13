@@ -27,6 +27,7 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 		
 	#area weight
 	if(is.null(warea)){
+    warea <- "warea"
 		y[,warea] <- rep(1L, nrow(y))
 	}else{
 		if(!is.numeric(y[,warea])){
@@ -39,6 +40,7 @@ reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, war
 	
 	#probability weight
 	if(is.null(wprob)){
+    wprob <- "wprob"
 		y[,wprob] <- rep(1L, nrow(y))
 	}else{
 		if(!is.numeric(y[,wprob])){
