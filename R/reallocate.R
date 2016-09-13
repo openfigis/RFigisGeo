@@ -3,23 +3,38 @@
 #' @description Computes a spatial reallocation of statistics
 #
 
-#' @param x a data.frame giving statistics reported for a given area
-#' @param y a data.frame giving intersections between 2 or more types of areas, the intersecting surface
-#'        and possibly a giving a probability field
-#' @param area.x name of the x-field representing the source area (typically an area code)
-#' @param area.y name of the y-field representing the target area (typically an area code)
-#' @param by.x name(s) of optional additional x-fields to be mapped
-#' @param by.y name(s) of optional additional y-fields to be mapped
-#' @param data name of the x-field representing the numerical values to reallocate
-#' @param warea name of the y-field representing the intersecting surface
-#' @param wprob name of the y-field representing an additional probability value. NULL by default
-#' @param aggregates name(s) of the y-field(s) that represent to target geographic dimension
+#' @param x object of class "data.frame" giving statistics reported for a given area
+#' @param y object of class "data.frame" giving intersections between 2 or more types
+#'        of areas, the intersecting surface and possibly giving a probability field
+#' @param area.x object of class "character" giving the name of the x-field representing
+#'        the source area (typically an area code)
+#' @param area.y object of class "character" giving the name of the y-field representing
+#'        the source area in object provided in argument y (typically an area code)
+#' @param by.x object of class "character" (possibly a vector) giving the name(s) of
+#'        optional additional x-fields to be mapped
+#' @param by.y object of class "character" (possibly a vector) giving the name(s) of
+#'        optional additional y-fields to be mapped
+#' @param data object of class "character" giving the name of the x-field representing
+#'        the numerical values to reallocate
+#' @param warea object of class "character" giving the name of the y-field representing
+#'        the intersecting surface. NULL by default
+#' @param wprob object of class "character" giving the name of the y-field representing
+#'        an additional probability value. NULL by default
+#' @param aggregates object of class "character" (possibly a vector) giving the name(s) of
+#'        the y-field(s) that represent to target geographic dimension. Default is NULL (in
+#'        which case the raw computations will be returned, with no aggregation at all)
 #' @return an object of class "data.frame"
+#' 
+#' @note At least a value has to be provided for 'warea' (area reallocation) or 'wprob'
+#'       (probabilistic reallocation). Both reallocation can be combined together.
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #' 
-reallocate <- function(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea = NULL, wprob = NULL, aggregates = NULL){
-	
+reallocate <- function(x, y,
+                       area.x, area.y, by.x = NULL, by.y = NULL, data,
+                       warea = NULL, wprob = NULL,
+                       aggregates = NULL){
+  
 	if(is.null(warea) && is.null(wprob)){
 		stop("Value is required for 'warea' (areal reallocation) or 'wprob' (probabilistic reallocation) or both (if combined)")
 	}

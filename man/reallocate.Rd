@@ -4,36 +4,49 @@
 \alias{reallocate}
 \title{reallocate}
 \usage{
-reallocate(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data, warea,
-  wprob = NULL, aggregates = NULL)
+reallocate(x, y, area.x, area.y, by.x = NULL, by.y = NULL, data,
+  warea = NULL, wprob = NULL, aggregates = NULL)
 }
 \arguments{
-\item{x}{a data.frame giving statistics reported for a given area}
+\item{x}{object of class "data.frame" giving statistics reported for a given area}
 
-\item{y}{a data.frame giving intersections between 2 or more types of areas, the intersecting surface
-and possibly a giving a probability field}
+\item{y}{object of class "data.frame" giving intersections between 2 or more types
+of areas, the intersecting surface and possibly giving a probability field}
 
-\item{area.x}{name of the x-field representing the source area (typically an area code)}
+\item{area.x}{object of class "character" giving the name of the x-field representing
+the source area (typically an area code)}
 
-\item{area.y}{name of the y-field representing the target area (typically an area code)}
+\item{area.y}{object of class "character" giving the name of the y-field representing
+the source area in object provided in argument y (typically an area code)}
 
-\item{by.x}{name(s) of optional additional x-fields to be mapped}
+\item{by.x}{object of class "character" (possibly a vector) giving the name(s) of
+optional additional x-fields to be mapped}
 
-\item{by.y}{name(s) of optional additional y-fields to be mapped}
+\item{by.y}{object of class "character" (possibly a vector) giving the name(s) of
+optional additional y-fields to be mapped}
 
-\item{data}{name of the x-field representing the numerical values to reallocate}
+\item{data}{object of class "character" giving the name of the x-field representing
+the numerical values to reallocate}
 
-\item{warea}{name of the y-field representing the intersecting surface}
+\item{warea}{object of class "character" giving the name of the y-field representing
+the intersecting surface. NULL by default}
 
-\item{wprob}{name of the y-field representing an additional probability value. NULL by default}
+\item{wprob}{object of class "character" giving the name of the y-field representing
+an additional probability value. NULL by default}
 
-\item{aggregates}{name(s) of the y-field(s) that represent to target geographic dimension}
+\item{aggregates}{object of class "character" (possibly a vector) giving the name(s) of
+the y-field(s) that represent to target geographic dimension. Default is NULL (in
+which case the raw computations will be returned, with no aggregation at all)}
 }
 \value{
 an object of class "data.frame"
 }
 \description{
 Computes a spatial reallocation of statistics
+}
+\note{
+At least a value has to be provided for 'warea' (area reallocation) or 'wprob'
+      (probabilistic reallocation). Both reallocation can be combined together.
 }
 \author{
 Emmanuel Blondel \email{emmanuel.blondel1@gmail.com}

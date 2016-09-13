@@ -5,7 +5,7 @@
 \title{intersection}
 \usage{
 intersection(features1, features2, gmlIdAttributeName = c("gml_id", "gml_id"),
-  areaCRS)
+  areaCRS = NULL)
 }
 \arguments{
 \item{features1}{a first sp object}
