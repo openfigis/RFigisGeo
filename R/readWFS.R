@@ -30,7 +30,7 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
 		# download the data
 		percentCodes <- "%20"
 		names(percentCodes) <- "\x20"
-		content <- getURL(curlPercentEncode(x = wfsRequest, codes = percentCodes))
+		content <- getURL(curlPercentEncode(x = wfsRequest, codes = percentCodes), .encoding = "UTF-8")
 		xmlfile <- xmlTreeParse(content, useInternalNodes = TRUE)
 		
 		if(!all(class(xmlfile) == c("XMLInternalDocument","XMLAbstractDocument"))){
