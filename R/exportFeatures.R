@@ -30,7 +30,7 @@ exportFeatures <- function(features, outputFormat = "SHP", tozip = FALSE,
   
   #manage output formats
   if(outputFormat == "SHP"){
-    writeOGR(features, file.path, file.name, driver="ESRI Shapefile")
+    writeOGR(features, file.path, file.name, driver="ESRI Shapefile", encoding = "UTF-8")
     shapefiles <- list.files(file.path, pattern = file.name, full.names=TRUE)
     if(tozip){
       outputFile<-paste(file.path,"/",file.name,".zip",sep="")
@@ -43,7 +43,7 @@ exportFeatures <- function(features, outputFormat = "SHP", tozip = FALSE,
 
   }else if(outputFormat == "GML"){
     outputFile <- paste(file.path, "/", file.name, ".gml", sep="")
-    writeOGR(features, dsn = outputFile, layer = file.name, driver="GML")
+    writeOGR(features, dsn = outputFile, layer = file.name, driver="GML", encoding = "UTF-8")
     if(tozip){
       outputZipFile <- paste(file.path, "/", file.name, ".zip", sep="")
       zip(zipfile=outputZipFile, flags="-r9Xj", files=outputFile) # requires R_ZIPCMD to be set in linux OS.
