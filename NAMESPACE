@@ -12,6 +12,5 @@ export(
 	exportFeatures,
 	intersection,
   toSpatialPoints,
-  joinByArea,
-	reallocate
+  joinByArea
 )

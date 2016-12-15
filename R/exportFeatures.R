@@ -30,8 +30,15 @@ exportFeatures <- function(features, outputFormat = "SHP", tozip = FALSE,
   
   #manage output formats
   if(outputFormat == "SHP"){
-    writeOGR(features, file.path, file.name, driver="ESRI Shapefile", encoding = "UTF-8")
+    
+    gdalIconv <- .Call("RGDAL_CPL_RECODE_ICONV", PACKAGE="rgdal")
+    if(gdalIconv) setCPLConfigOption("SHAPE_ENCODING", "UTF-8")
+    
+    writeOGR(features, file.path, file.name, driver="ESRI Shapefile")
     shapefiles <- list.files(file.path, pattern = file.name, full.names=TRUE)
+    
+    if(gdalIconv) setCPLConfigOption("SHAPE_ENCODING", NULL)
+      
     if(tozip){
       outputFile<-paste(file.path,"/",file.name,".zip",sep="")
       zip(zipfile=outputFile, flags="-r9Xj", files=shapefiles) # requires R_ZIPCMD to be set in linux OS.
