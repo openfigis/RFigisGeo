@@ -75,7 +75,7 @@ intersection <- function(features1, features2,
   },error=function(error){
   	logger.error(paste(error,"\n"))
   })
-  if(is.null(features.intersects) | !any(feature.intersects)){
+  if(is.null(features.intersects) | !any(features.intersects)){
   	logger.warn("No intersect between the 2 source feature collections")
   	return(NULL)
   }
