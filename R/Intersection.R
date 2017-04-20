@@ -79,6 +79,10 @@ intersection <- function(features1, features2,
   	logger.warn("No intersect between the 2 source feature collections")
   	return(NULL)
   }
+	
+  #stop here if no intersects at all
+  if(!any(feature.intersects)) return(NULL)
+	
   features1 <- features1[apply(features.intersects, 2L, function(x) {sum(x)}) > 0, ]
   features2 <- features2[apply(features.intersects, 1L, function(x) {sum(x)}) > 0, ]
   int <- gIntersects(features1, features2, byid=TRUE)
