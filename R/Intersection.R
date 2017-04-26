@@ -180,7 +180,7 @@ intersection <- function(features1, features2,
     }
 	  
 	  merge.df$Row.names <- NULL	  
-	  merge.df <- cbind(gml_id = row.names(int.features), merge.df, stringsAsFactors = FALSE)
+	  merge.df <- merge.df[match(row.names(int.features),merge.df$Row.names),]
 	  rownames(merge.df) <- row.names(int.features)
 	  
 	  #build the result sp dataframe
