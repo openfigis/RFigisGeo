@@ -177,10 +177,10 @@ intersection <- function(features1, features2,
   		merge.df$per_area1 <- merge.df$geo_area / merge.df$geo_area1 * 100
   		merge.df$per_area2 <- merge.df$geo_area / merge.df$geo_area2 * 100
   		
-    }
-	  
-	  merge.df$Row.names <- NULL	  
+    	  }
+	    
 	  merge.df <- merge.df[match(row.names(int.features),merge.df$Row.names),]
+	  merge.df$Row.names <- NULL	
 	  rownames(merge.df) <- row.names(int.features)
 	  
 	  #build the result sp dataframe
