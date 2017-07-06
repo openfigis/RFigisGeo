@@ -127,14 +127,17 @@ intersection <- function(features1, features2,
   int.features <- do.call("rbind",vec[sapply(vec, function(x) !is.null(x) & !inherits(x, "try-error"))])
   
   #ids pairs
-  rn <- row.names(int.features)
-  nrn <- do.call("rbind", strsplit(rn, " "))
-  int.id <- paste(nrn[,1], nrn[,2], sep = "_x_")
-  int.features.structure <- data.frame(ID = int.id,
-                                       features1 = nrn[,1], features2 = nrn[,2],
-                                       stringsAsFactors=FALSE)
-  if(regexpr("SpatialPoints", class(int.features)) == -1) int.features <- spChFIDs(int.features, int.id)
-  
+  int.features.structure <- NULL
+  if(!is.null(int.features)){					     
+	  rn <- row.names(int.features)
+	  nrn <- do.call("rbind", strsplit(rn, " "))
+	  int.id <- paste(nrn[,1], nrn[,2], sep = "_x_")
+	  int.features.structure <- data.frame(ID = int.id,
+					       features1 = nrn[,1], features2 = nrn[,2],
+					       stringsAsFactors=FALSE)
+	  if(regexpr("SpatialPoints", class(int.features)) == -1) int.features <- spChFIDs(int.features, int.id)
+  }
+					     
   #append attributes
   out <- int.features
   if(hasData1 || hasData2){
