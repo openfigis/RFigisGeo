@@ -140,7 +140,7 @@ intersection <- function(features1, features2,
 					     
   #append attributes
   out <- int.features
-  if(hasData1 || hasData2){
+  if(!is.null(int.features) & (hasData1 || hasData2)){
 	  
 	  #compute areas if no areaCRS is provided or if an valid areaCRS is provided.
 	  #(i.e. areas are not computed if areaCRS=NA)
