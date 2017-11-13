@@ -4,6 +4,7 @@ import(XML)
 import(sp)
 import(rgdal)
 import(rgeos)
+import(raster)
 import(uuid)
 
 export(
@@ -12,5 +13,6 @@ export(
 	exportFeatures,
 	intersection,
   toSpatialPoints,
-  joinByArea
+  joinByArea,
+	createCWPGrid
 )
