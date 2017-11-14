@@ -60,7 +60,7 @@ createCWPGrid <- function(size = NULL, res = NULL){
     
     cwp.idx <- NA
     if(grid$size < 5){
-      m <- as.integer(bbox(poly))
+      m <- as.integer(round(bbox(poly)))
       mr <- raster(extent(matrix(m, nrow=2)), nrow=length(seq(m[2],m[4], grid$lat))-1, ncol=length(seq(m[1], m[3], grid$lon))-1, crs = NA)
       mr[] <- 1:ncell(mr)
       mr.sp <- as(mr, "SpatialPolygonsDataFrame")
