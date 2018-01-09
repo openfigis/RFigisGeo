@@ -49,7 +49,11 @@ createCWPGrid <- function(size = NULL, res = NULL){
   sp <- as(r, "SpatialPolygonsDataFrame")
   proj4string(sp) <- llcrs
   
+  #densify adding vertices each minute
+  sp <- addVertices(sp, each = 1/60)
+  
   #attributes (including grid coding)
+  idx <- 0
   attrs <- do.call("rbind", lapply(sp@polygons, function(poly){
     labpt <- slot(poly, "labpt")
     quadrant <- paste0(ifelse(labpt[1]<0,"S","N"), ifelse(labpt[2]<0,"W","E"))
@@ -61,6 +65,8 @@ createCWPGrid <- function(size = NULL, res = NULL){
     cwp.idx <- NA
     if(grid$size < 5){
       m <- as.integer(trunc(bbox(poly)))
+      idx <<- idx+1
+      print(idx)
       mr <- raster(extent(matrix(m, nrow=2)), nrow=length(seq(m[2],m[4], grid$lat))-1, ncol=length(seq(m[1], m[3], grid$lon))-1, crs = NA)
       mr[] <- 1:ncell(mr)
       mr.sp <- as(mr, "SpatialPolygonsDataFrame")
