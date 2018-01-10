@@ -8,13 +8,17 @@ r:
   - release
   - devel
   
-r_binary_packages:
+#r_binary_packages:
+#  - RCurl
+#  - XML
+#  - rgdal
+#  - rgeos
+  
+r_packages:
+  - devtools
   - RCurl
   - XML
   - rgdal
-  - rgeos
-  
-r_packages:
   - testthat
   - sp
   - uuid
