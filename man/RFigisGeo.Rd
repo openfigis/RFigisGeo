@@ -13,7 +13,7 @@ RFigisGeo provides a set of utility tools to do geospatial data processing
    Package: \tab RFigisGeo\cr
    Type: \tab Package\cr
    Version: \tab 0.3\cr
-   Date: \tab 2018-01-09\cr
+   Date: \tab 2018-02-14\cr
    License: \tab GPL(>=2.0)\cr
    LazyLoad: \tab yes\cr
  }
