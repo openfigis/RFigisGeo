@@ -15,5 +15,7 @@ export(
   toSpatialPoints,
   joinByArea,
 	addVertices,
-	createCWPGrid
+	createCWPGrid,
+	clipToExtent,
+	clipToGlobalExtent
 )
