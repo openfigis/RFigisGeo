@@ -11,7 +11,7 @@
 #' 
 clipToExtent <- function(sp, bb){
   
-  if(!is(bb, "matrix") stop("'bb' argument should be a 'matrix' object")
+  if(!is(bb, "matrix")) stop("'bb' argument should be a 'matrix' object")
   
   #first check bb
   sp.bbox <- bbox(sp)
