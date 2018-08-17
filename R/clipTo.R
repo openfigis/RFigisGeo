@@ -22,7 +22,6 @@ clipToExtent <- function(sp, bb){
      
   #coonvert bb to poly
   b_poly <- as(extent(as.vector(t(bb))), "SpatialPolygons")
-  else b_poly <- as(extent(bb), "SpatialPolygons")
   proj4string(b_poly) <- CRS(proj4string(sp))
   return(RFigisGeo::intersection(sp, b_poly))
 }
