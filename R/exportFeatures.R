@@ -35,13 +35,13 @@ exportFeatures <- function(features, outputFormat = "SHP", tozip = FALSE,
     if(gdalIconv) setCPLConfigOption("SHAPE_ENCODING", NULL)
     
     writeOGR(features, file.path, file.name, driver="ESRI Shapefile", overwrite_layer=T)
-    writeEncFile <- function(extension, encoding = "UTF-8"){
-      encFile <- file(paste(file.name, extension, sep="."))
+    writeEncFile <- function(file.path, file.name, extension, encoding = "UTF-8"){
+      encFile <- file(paste(paste(file.path, file.name, sep="/"), extension, sep="."))
       writeLines(encoding, encFile, sep="")
       unlink(encFile)
     }
-    writeEncFile("cst")
-    writeEncFile("cpg")
+    writeEncFile(file.path, file.name, "cst")
+    writeEncFile(file.path, file.name, "cpg")
  
     shapefiles <- list.files(file.path, pattern = file.name, full.names=TRUE)
     
