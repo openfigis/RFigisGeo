@@ -170,7 +170,7 @@ intersection <- function(features1, features2,
 	  merge.df$features2 <- NULL
 	  merge.df[, gmlIdAttributeName[1L]] <- NULL
 	  merge.df$ID <- NULL
-
+	  
 	  if (withArea) {
   		#intersection area
   		area.df <- data.frame(geo_area=gArea(spTransform(int.features, areaCRS), byid=TRUE))
@@ -180,7 +180,9 @@ intersection <- function(features1, features2,
   		merge.df$per_area1 <- merge.df$geo_area / merge.df$geo_area1 * 100
   		merge.df$per_area2 <- merge.df$geo_area / merge.df$geo_area2 * 100
   		
-    	  }
+    	  } else {
+		merge.df$Row.names <- row.names(merge.df)	  
+	  }
 	    
 	  merge.df <- merge.df[match(row.names(int.features),merge.df$Row.names),]
 	  merge.df$Row.names <- NULL	
