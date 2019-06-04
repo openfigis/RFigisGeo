@@ -4,12 +4,16 @@
 \alias{addVertices}
 \title{addVertices}
 \usage{
-addVertices(sp, each = 0.1)
+addVertices(sp, each = 0.1, parallel = FALSE, ...)
 }
 \arguments{
 \item{sp}{an object of class "SpatialPolygons"}
 
 \item{each}{the step value to use to create vertices}
+
+\item{parallel}{run in parallel}
+
+\item{...}{parallel options}
 }
 \value{
 an object of class "SpatialPolygons"

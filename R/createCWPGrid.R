@@ -8,6 +8,8 @@
 #' resolutions values are '10min_x_10min', '20min_x_20min', '30min_x_30min',
 #' '30min_x_1deg', '1deg_x_1deg', '5deg_x_5deg', '10deg_x_10deg', '20deg_x_20deg',
 #' '30deg_x_30deg'"
+#' @param parallel run in parallel
+#' @param ... parallel options
 #' @return an object of class "SpatialPolygonsDataFrame"
 #' 
 #' @references 
@@ -15,7 +17,9 @@
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
-createCWPGrid <- function(size = NULL, res = NULL){
+createCWPGrid <- function(size = NULL, res = NULL, parallel = FALSE, ...){
+  
+  applyHandler <- if(parallel) parallel::mclapply else lapply
   
   #reference resolutions
   grids <- data.frame(
@@ -50,11 +54,11 @@ createCWPGrid <- function(size = NULL, res = NULL){
   proj4string(sp) <- llcrs
   
   #densify adding vertices each minute
-  sp <- addVertices(sp, each = 1/60)
+  sp <- addVertices(sp, each = 1/60, parallel = parallel, ...)
   
   #attributes (including grid coding)
   idx <- 0
-  attrs <- do.call("rbind", lapply(sp@polygons, function(poly){
+  attrs <- do.call("rbind", applyHandler(sp@polygons, function(poly){
     labpt <- slot(poly, "labpt")
     quadrant <- paste0(ifelse(labpt[1]<0,"S","N"), ifelse(labpt[2]<0,"W","E"))
     quadrant_id <- switch(quadrant, "NE" = 1L, "SE" = 2L, "SW" = 3L, "NW" = 4L)
@@ -88,7 +92,7 @@ createCWPGrid <- function(size = NULL, res = NULL){
                      CWP_A = grid$size, CWP_B = quadrant_id, CWP_C = corner_lat, CWP_D = corner_lon, CWP_E = cwp.idx,
                      CWP_CODE = gridcode, SURFACE = gArea(spTransform(SpatialPolygons(Srl = list(poly), proj4string = llcrs), eckp4s)))
     return(df)
-  }))
+  }, ...))
   
   sp@data <- attrs
   return(sp)

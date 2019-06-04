@@ -4,12 +4,17 @@
 #' 
 #' @param sp an object of class "SpatialPolygons"
 #' @param each the step value to use to create vertices
+#' @param parallel run in parallel
+#' @param ... parallel options
 #' @return an object of class "SpatialPolygons"
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
-addVertices <- function(sp, each = 0.1){
-  sp@polygons <- lapply(sp@polygons, function(p){
+addVertices <- function(sp, each = 0.1, parallel = FALSE, ...){
+  
+  applyHandler <- if(parallel) parallel::mclapply else lapply
+  
+  sp@polygons <- applyHandler(sp@polygons, function(p){
     coords <- slot(p,"Polygons")[[1]]@coords
     newcoords <- do.call("rbind",lapply(1:(nrow(coords)-1), function(i){
       i_coords <- coords[i:(i+1),]
@@ -25,6 +30,6 @@ addVertices <- function(sp, each = 0.1){
     }))
     slot(p,"Polygons")[[1]]@coords <- newcoords
     return(p)
-  })
+  }, ...)
   return(sp)
 }

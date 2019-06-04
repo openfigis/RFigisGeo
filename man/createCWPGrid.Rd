@@ -4,7 +4,7 @@
 \alias{createCWPGrid}
 \title{createCWPGrid}
 \usage{
-createCWPGrid(size = NULL, res = NULL)
+createCWPGrid(size = NULL, res = NULL, parallel = FALSE, ...)
 }
 \arguments{
 \item{size}{an integer code corresponding to the grid size (referred as code
@@ -14,6 +14,10 @@ A in the CWP Handbook)}
 resolutions values are '10min_x_10min', '20min_x_20min', '30min_x_30min',
 '30min_x_1deg', '1deg_x_1deg', '5deg_x_5deg', '10deg_x_10deg', '20deg_x_20deg',
 '30deg_x_30deg'"}
+
+\item{parallel}{run in parallel}
+
+\item{...}{parallel options}
 }
 \value{
 an object of class "SpatialPolygonsDataFrame"

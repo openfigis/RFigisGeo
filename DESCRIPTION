@@ -1,6 +1,6 @@
 Package: RFigisGeo
 Version: 0.3
-Date: 2018-08-15
+Date: 2018-06-04
 Title: Set of geoprocessing facilities used in FIGIS
 Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel@fao.org"),
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))
@@ -12,4 +12,4 @@ Description: Provides a set of geoprocessing facilities used in FIGIS.
 License: GPL (>= 2)
 URL: https://github.com/openfigis/RFigisGeo
 BugReports: https://github.com/openfigis/RFigisGeo/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
