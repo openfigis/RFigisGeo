@@ -17,6 +17,9 @@ readWFS <- function(url, outputFormat = "GML", p4s = NULL,
                     gmlIdAttributeName="gml_id", target.dir = NULL,
                     verbose = TRUE){
   
+  logger.warn(paste("The 'readWFS' function is deprecated. Please use 'ows4R' package (available on CRAN) with the 'WFSClient'.",
+                   "Examples are available at https://github.com/eblondel/ows4R/wiki#43-r-interface-to-web-feature-service-wfs"))
+
   features <- NULL
   
   #request
