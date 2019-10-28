@@ -8,6 +8,10 @@
 #' resolutions values are '10min_x_10min', '20min_x_20min', '30min_x_30min',
 #' '30min_x_1deg', '1deg_x_1deg', '5deg_x_5deg', '10deg_x_10deg', '20deg_x_20deg',
 #' '30deg_x_30deg'"
+#' @param xmin xmin of the output grid
+#' @param ymin ymin of the output grid
+#' @param xmax xmax of the output grid
+#' @param ymax ymax of the output grid
 #' @param parallel run in parallel
 #' @param ... parallel options
 #' @return an object of class "SpatialPolygonsDataFrame"
@@ -17,7 +21,9 @@
 #' 
 #' @author Emmanuel Blondel \email{emmanuel.blondel1@@gmail.com}
 #'
-createCWPGrid <- function(size = NULL, res = NULL, parallel = FALSE, ...){
+createCWPGrid <- function(size = NULL, res = NULL,
+                          xmin = NULL, ymin = NULL, xmax = NULL, ymax = NULL,
+                          parallel = FALSE, ...){
   
   applyHandler <- if(parallel) parallel::mclapply else lapply
   
@@ -29,6 +35,12 @@ createCWPGrid <- function(size = NULL, res = NULL, parallel = FALSE, ...){
     res = c("10min_x_10min", "20min_x_20min","30min_x_30min", "30min_x_1deg",
             "1deg_x_1deg", "5deg_x_5deg", "10deg_x_10deg", "20deg_x_20deg", "30deg_x_30deg")
   )
+  
+  #bbbox
+  xmin <- if(is.null(xmin)) -180 else xmin
+  ymin <- if(is.null(ymin)) -90 else ymin
+  xmax <- if(is.null(xmax)) 180 else xmax
+  ymax <- if(is.null(ymax)) 90 else ymax
   
   #select grid resolution
   if(!is.null(size)){
@@ -46,8 +58,8 @@ createCWPGrid <- function(size = NULL, res = NULL, parallel = FALSE, ...){
   eckp4s <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
   llp4s <- "+init=epsg:4326"
   llcrs <- CRS(llp4s)
-  r <- raster(extent(matrix( c(-180, -90, 180,  90), nrow=2)),
-              nrow=length(seq(-90,90, grid$lat))-1, ncol=length(seq(-180,180, grid$lon))-1, 
+  r <- raster(extent(matrix( c(xmin, ymin, xmax,  ymax), nrow=2)),
+              nrow=length(seq(ymin,ymax, grid$lat))-1, ncol=length(seq(xmin,xmax, grid$lon))-1, 
               crs = llp4s)            
   r[] <- 1:ncell(r)
   sp <- as(r, "SpatialPolygonsDataFrame")
