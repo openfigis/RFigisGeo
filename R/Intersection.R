@@ -41,7 +41,7 @@ intersection <- function(features1, features2,
   
   #check CRS
   targetCRS <- proj4string(features1)
-  if (targetCRS != proj4string(features2)) {
+  if(!is.na(targetCRS)) if (targetCRS != proj4string(features2)) {
     print("CRS differ, try to project the second feature collection")
     features2 <- spTransform(features2, CRS(targetCRS));  	
   }
