@@ -72,7 +72,7 @@ createCWPGrid <- function(size = NULL, res = NULL,
   idx <- 0
   attrs <- do.call("rbind", applyHandler(sp@polygons, function(poly){
     labpt <- slot(poly, "labpt")
-    quadrant <- paste0(ifelse(labpt[1]<0,"S","N"), ifelse(labpt[2]<0,"W","E"))
+    quadrant <- paste0(ifelse(labpt[2]<0,"S","N"), ifelse(labpt[1]<0,"W","E"))
     quadrant_id <- switch(quadrant, "NE" = 1L, "SE" = 2L, "SW" = 3L, "NW" = 4L)
     corner_lon <- as.integer(min(abs(bbox(poly)[1L,])))
     corner_lat <- as.integer(min(abs(bbox(poly)[2L,])))
@@ -80,7 +80,7 @@ createCWPGrid <- function(size = NULL, res = NULL,
     
     cwp.idx <- NA
     if(grid$size < 5){
-	  m.bbox <- bbox(poly)
+	    m.bbox <- bbox(poly)
       m <- as.integer(floor(m.bbox))
       if(m[4]==m[2]) m[4] <- m[4]+1
       if(m[3]==m[1]) m[3] <- m[3]+1
