@@ -10,8 +10,8 @@
 #' \tabular{ll}{
 #'    Package: \tab RFigisGeo\cr
 #'    Type: \tab Package\cr
-#'    Version: \tab 0.3-1\cr
-#'    Date: \tab 2019-10-28\cr
+#'    Version: \tab 0.3-2\cr
+#'    Date: \tab 2020-01-23\cr
 #'    License: \tab GPL(>=2.0)\cr
 #'    LazyLoad: \tab yes\cr
 #'  }

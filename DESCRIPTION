@@ -1,6 +1,6 @@
 Package: RFigisGeo
-Version: 0.3-1
-Date: 2018-10-28
+Version: 0.3-2
+Date: 2020-01-23
 Title: Set of geoprocessing facilities used in FIGIS
 Authors@R: c(person("Emmanuel", "Blondel", role = c("aut", "cre"), email = "emmanuel.blondel@fao.org"),
 			 person("Norbert", "Billet", role = "aut", email = "norbert.billet@ird.fr"))
