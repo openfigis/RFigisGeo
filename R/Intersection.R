@@ -106,6 +106,16 @@ intersection <- function(features1, features2,
     )
     
     if(class(output) == "SpatialCollections"){
+      output <- try(
+        gIntersection(
+          features2[feat2,],
+          features1[feat1,],
+          byid = TRUE
+        )
+      )
+    }
+    
+    if(class(output) == "SpatialCollections"){
       
       spf <- slot(output, paste(trgGeomObj, "obj", sep = ""))
       sflist <- lapply(slot(spf, trgGeomSlot[1]), function(t){
