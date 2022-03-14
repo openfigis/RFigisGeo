@@ -74,8 +74,8 @@ createCWPGrid <- function(size = NULL, res = NULL,
     labpt <- slot(poly, "labpt")
     quadrant <- paste0(ifelse(labpt[2]<0,"S","N"), ifelse(labpt[1]<0,"W","E"))
     quadrant_id <- switch(quadrant, "NE" = 1L, "SE" = 2L, "SW" = 3L, "NW" = 4L)
-    corner_lon <- as.integer(min(abs(bbox(poly)[1L,])))
-    corner_lat <- as.integer(min(abs(bbox(poly)[2L,])))
+    corner_lon <- sprintf("%03.f", as.integer(min(abs(bbox(poly)[1L,]))))
+    corner_lat <- sprintf("%02.f", as.integer(min(abs(bbox(poly)[2L,]))))
     gridcode <- paste0(grid$size, quadrant_id, corner_lat, corner_lon)
     
     cwp.idx <- NA
