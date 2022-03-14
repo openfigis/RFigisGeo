@@ -4,8 +4,13 @@
 \alias{exportFeatures}
 \title{exportFeatures}
 \usage{
-exportFeatures(features, outputFormat = "SHP", tozip = FALSE,
-  file.path = NULL, file.name = NULL)
+exportFeatures(
+  features,
+  outputFormat = "SHP",
+  tozip = FALSE,
+  file.path = NULL,
+  file.name = NULL
+)
 }
 \arguments{
 \item{features}{the sp object to export}

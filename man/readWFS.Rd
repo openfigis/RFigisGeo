@@ -4,8 +4,14 @@
 \alias{readWFS}
 \title{readWFS}
 \usage{
-readWFS(url, outputFormat = "GML", p4s = NULL,
-  gmlIdAttributeName = "gml_id", target.dir = NULL, verbose = TRUE)
+readWFS(
+  url,
+  outputFormat = "GML",
+  p4s = NULL,
+  gmlIdAttributeName = "gml_id",
+  target.dir = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{url}{the baseURL of the WFS GetFeature request}
