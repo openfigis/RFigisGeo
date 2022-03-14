@@ -4,8 +4,16 @@
 \alias{createCWPGrid}
 \title{createCWPGrid}
 \usage{
-createCWPGrid(size = NULL, res = NULL, xmin = NULL, ymin = NULL,
-  xmax = NULL, ymax = NULL, parallel = FALSE, ...)
+createCWPGrid(
+  size = NULL,
+  res = NULL,
+  xmin = NULL,
+  ymin = NULL,
+  xmax = NULL,
+  ymax = NULL,
+  parallel = FALSE,
+  ...
+)
 }
 \arguments{
 \item{size}{an integer code corresponding to the grid size (referred as code
