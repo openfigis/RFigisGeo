@@ -54,6 +54,12 @@ createCWPGrid <- function(size = NULL, res = NULL,
     }
   }
   
+  #special case of 20deg resolution
+  if(grid$size == 8){
+    ymin = -80
+    ymax = 80
+  }
+  
   #create grid
   eckp4s <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
   llp4s <- "+init=epsg:4326"
